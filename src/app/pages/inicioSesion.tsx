@@ -2,6 +2,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,10 +10,10 @@ import {
   AlertDialogContent,
 } from '../../components/ui/alert-dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../../components/ui/input-otp';
+import { Loader2Icon, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { Link } from 'react-router-dom';
-import FitLifeLogo from '../../assets/fitlife-logo.svg';
 
 export function InicioSesion() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -20,7 +21,12 @@ export function InicioSesion() {
   const [otpValue, setOtpValue] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   
   // Cambiar el título de la página
   useDocumentTitle('Iniciar Sesión - FitLife');
@@ -36,16 +42,63 @@ export function InicioSesion() {
     };
   }, []);
 
+  // Función para validar email
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Función para validar contraseña
+  const validatePassword = (password: string) => {
+    return password.length >= 8;
+  };
+
   // Función para manejar el envío del formulario inicial
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      // Simular envío de código OTP
+    
+    // Limpiar errores previos
+    setEmailError("");
+    setPasswordError("");
+    setShowAlert(false);
+
+    let hasErrors = false;
+
+    // Validar email
+    if (!email) {
+      setEmailError("El correo es requerido");
+      hasErrors = true;
+    } else if (!validateEmail(email)) {
+      setEmailError("Por favor ingresa un correo válido");
+      hasErrors = true;
+    }
+
+    // Validar contraseña
+    if (!password) {
+      setPasswordError("La contraseña es requerida");
+      hasErrors = true;
+    } else if (!validatePassword(password)) {
+      setPasswordError("La contraseña debe tener al menos 8 caracteres");
+      hasErrors = true;
+    }
+
+    // Si hay errores, no continuar
+    if (hasErrors) {
+      return;
+    }
+
+    // Validar credenciales específicas
+    if (email === "herreraloezae@gmail.com" && password === "12345678") {
+      // Credenciales correctas - proceder con OTP
       setIsSubmitting(true);
       setTimeout(() => {
         setIsSubmitting(false);
         setShowOTPDialog(true);
       }, 1500);
+    } else {
+      // Credenciales incorrectas - mostrar alert
+      setAlertMessage("Correo o contraseña incorrectos.\nPor favor, verifica tus credenciales.");
+      setShowAlert(true);
     }
   };
 
@@ -64,14 +117,14 @@ export function InicioSesion() {
   };
 
   return (
-    <div className="flex items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4 ">
       <Card 
         className={`w-full px-10 bg-white shadow-lg hover:shadow-xl transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
           isLoaded 
             ? 'translate-y-0 opacity-100' 
             : 'translate-y-8 opacity-0'
         }`}
-        style={{ maxWidth: '672px' }}
+        style={{ maxWidth: '672px', minHeight: '620px' }}
       >
         <CardHeader className={`text-center pb-6 transition-all duration-300 ease-out delay-150 ${
           isLoaded 
@@ -79,14 +132,28 @@ export function InicioSesion() {
             : 'translate-y-6 opacity-0'
         }`}>
           <div className="flex justify-center">
-            <img 
-              src={FitLifeLogo} 
-              alt="FitLife" 
-              className="h-12 w-auto"
-            />
+            <h1 className="text-3xl font-bold text-gray-800 tracking-wider">
+              FITLIFE
+            </h1>
           </div>
         </CardHeader>
         <CardContent className="space-y-6 px-8 pb-8">
+          {/* Alert para errores de credenciales */}
+          {showAlert && (
+            <div className={`transition-all duration-700 ease-out delay-200 ${
+              isLoaded 
+                ? 'translate-y-0 opacity-100' 
+                : 'translate-y-6 opacity-0'
+            }`}>
+              <Alert variant="destructive" className="border-red-500 bg-red-50">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-red-700 whitespace-pre-line">
+                  {alertMessage}
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
+          
           <form className="space-y-4" onSubmit={handleLogin}>
             <div className={`space-y-2 transition-all duration-700 ease-out delay-300 ${
               isLoaded 
@@ -100,16 +167,28 @@ export function InicioSesion() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError(""); // Limpiar error al escribir
+                  if (showAlert) setShowAlert(false); // Ocultar alert al escribir
+                }}
                 placeholder="tu@ejemplo.com"
                 required
-                className="w-full h-12 border-gray-300 rounded-lg text-black placeholder:text-gray-400 hover:scale-105 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:scale-105 transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] autofill:bg-transparent autofill:shadow-[inset_0_0_0px_1000px_transparent]"
+                className={`w-full h-12 border-gray-300 rounded-lg text-black placeholder:text-gray-400 hover:scale-105 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:scale-105 transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] autofill:bg-transparent autofill:shadow-[inset_0_0_0px_1000px_transparent] ${
+                  emailError ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+                }`}
                 style={{
                   WebkitBoxShadow: "0 0 0 1000px transparent inset",
                   WebkitTextFillColor: "#000000",
+                  caretColor: "#000000",
                   transition: "background-color 5000s ease-in-out 0s, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
                 }}
               />
+              {emailError && (
+                <p className="text-red-500 text-sm mt-1 animate-fade-in">
+                  {emailError}
+                </p>
+              )}
             </div>
             
             <div className={`space-y-2 transition-all duration-700 ease-out delay-500 ${
@@ -120,20 +199,52 @@ export function InicioSesion() {
               <Label htmlFor="password" className="text-gray-700 font-medium">
                 Contraseña
               </Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Tu contraseña"
-                required
-                className="w-full h-12 border-gray-300 rounded-lg text-black placeholder:text-gray-400 hover:scale-105 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:scale-105 transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] autofill:bg-transparent autofill:shadow-[inset_0_0_0px_1000px_transparent]"
-                style={{
-                  WebkitBoxShadow: "0 0 0 1000px transparent inset",
-                  WebkitTextFillColor: "#000000",
-                  transition: "background-color 5000s ease-in-out 0s, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
-                }}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) setPasswordError(""); // Limpiar error al escribir
+                    if (showAlert) setShowAlert(false); // Ocultar alert al escribir
+                  }}
+                  placeholder="Tu contraseña"
+                  required
+                  className={`w-full h-12 pr-12 border-gray-300 rounded-lg text-black placeholder:text-gray-400 hover:scale-105 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:scale-105 transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] autofill:bg-transparent autofill:shadow-[inset_0_0_0px_1000px_transparent] ${
+                    passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+                  }`}
+                  style={{
+                    WebkitBoxShadow: "0 0 0 1000px transparent inset",
+                    WebkitTextFillColor: "#000000",
+                    caretColor: "#000000",
+                    transition: "background-color 5000s ease-in-out 0s, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200 bg-transparent border-none outline-none p-0"
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    padding: '0',
+                    outline: 'none',
+                    boxShadow: 'none'
+                  }}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
+              {passwordError && (
+                <p className="text-red-500 text-sm mt-1 animate-fade-in">
+                  {passwordError}
+                </p>
+              )}
             </div>
             
             <div className={`text-center pt-2 transition-all duration-700 ease-out delay-700 ${
@@ -151,19 +262,31 @@ export function InicioSesion() {
             
             <Button 
               type="submit"
-              className={`w-full h-12 !bg-black hover:!bg-white !border !border-black hover:!border-gray-300 !text-white hover:!text-black hover:scale-105 rounded-full font-medium transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] delay-[900ms] ${
+              disabled={isSubmitting || !email.trim() || !password.trim()}
+              className={`w-full h-12 rounded-full font-medium transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] delay-[900ms] disabled:cursor-not-allowed disabled:hover:scale-100 ${
                 isLoaded 
                   ? 'translate-y-0 opacity-100' 
                   : 'translate-y-6 opacity-0'
+              } ${
+                (!email.trim() || !password.trim()) 
+                  ? '!bg-gray-400 !border-gray-400 !text-gray-600 hover:!bg-gray-400 hover:!border-gray-400 hover:!text-gray-600'
+                  : '!bg-black hover:!bg-white !border !border-black hover:!border-gray-300 !text-white hover:!text-black hover:scale-105'
               }`}
               style={{
-                backgroundColor: 'black',
-                color: 'white',
-                border: '1px solid black',
+                backgroundColor: isSubmitting ? '#374151' : (!email.trim() || !password.trim()) ? '#9CA3AF' : 'black',
+                color: (!email.trim() || !password.trim()) ? '#6B7280' : 'white',
+                border: (!email.trim() || !password.trim()) ? '1px solid #9CA3AF' : '1px solid black',
                 transition: 'all 400ms cubic-bezier(0.4, 0.0, 0.2, 1)'
               }}
             >
-              Iniciar sesión
+              {isSubmitting ? (
+                <>
+                  <Loader2Icon className="animate-spin mr-2" size={16} />
+                  Cargando
+                </>
+              ) : (
+                'Iniciar sesión'
+              )}
             </Button>
           </form>
           
@@ -287,14 +410,59 @@ export function InicioSesion() {
             
             {/* Botones de acción */}
             <div className="flex gap-3">
-              <AlertDialogCancel className="flex-1 h-12 bg-white hover:bg-gray-50 text-black border-2 border-gray-300 hover:border-gray-400 rounded-xl font-medium transition-all duration-300">
+              <AlertDialogCancel 
+                disabled={isSubmitting}
+                className="flex-1 h-12 rounded-xl font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: '2px solid #ef4444',
+                  transition: 'all 300ms ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = '#dc2626';
+                    e.currentTarget.style.borderColor = '#dc2626';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = '#ef4444';
+                    e.currentTarget.style.borderColor = '#ef4444';
+                  }
+                }}
+              >
                 Cancelar
               </AlertDialogCancel>
               <AlertDialogAction 
                 onClick={handleOTPVerification}
-                className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white border-0 rounded-xl font-medium transition-all duration-300"
+                disabled={isSubmitting}
+                className="flex-1 h-12 rounded-xl font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: '#16a34a',
+                  color: 'white',
+                  border: '0',
+                  transition: 'all 300ms ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = '#15803d';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.backgroundColor = '#16a34a';
+                  }
+                }}
               >
-                Verificar Código
+                {isSubmitting ? (
+                  <>
+                    <Loader2Icon className="animate-spin mr-2" size={16} />
+                    Cargando
+                  </>
+                ) : (
+                  'Verificar Código'
+                )}
               </AlertDialogAction>
             </div>
             
@@ -303,6 +471,13 @@ export function InicioSesion() {
               <button 
                 type="button"
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline transition-colors duration-200"
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  padding: '0',
+                  outline: 'none',
+                  boxShadow: 'none'
+                }}
                 onClick={() => {
                   // Aquí puedes implementar la lógica para reenviar el código
                   console.log("Reenviando código...");

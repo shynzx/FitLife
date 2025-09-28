@@ -17,11 +17,9 @@ export function Header() {
       <div className="relative z-20 flex items-center justify-between w-full mx-auto">
         {/* Logo */}
         <div className="flex items-center pb-3.5">
-          <img 
-            src="/src/assets/fitlife-logo.svg" 
-            alt="FitLife" 
-            className="h-10 w-auto"
-          />
+          <h1 className="text-2xl font-bold text-black tracking-wider">
+            FITLIFE
+          </h1>
         </div>
 
         {/* Navigation */}
@@ -109,13 +107,13 @@ export function Header() {
 
           <HoverCard>
             <HoverCardTrigger asChild>
-              <div className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
+              <Link to="/mapa" className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
                 <div className="flex items-center space-x-2">
                   <Map size={20} className="text-black" />
                   <span className="text-black font-medium">Mapa</span>
                 </div>
                 <div className="h-0.5 w-0 bg-black transition-all duration-200 group-hover:w-full"></div>
-              </div>
+              </Link>
             </HoverCardTrigger>
             <HoverCardContent className="w-80">
               <div className="space-y-2">
@@ -152,7 +150,7 @@ export function Header() {
                   color="#9333ea"
                   speed="1.5s"
                   thickness={1}
-                  className="cursor-pointer no-underline transition-all duration-500 transform hover:scale-125"
+                  className="cursor-pointer no-underline transition-all duration-500 transform hover:scale-110"
                   innerClassName="relative z-1 backdrop-blur-md bg-black/90 border border-purple-400/30 text-white hover:bg-white/20 hover:text-black hover:border-purple-300/60 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-500 px-6 py-3 text-sm font-semibold rounded-[20px] text-center"
                   style={{ textDecoration: 'none' }}
                 >
@@ -166,7 +164,7 @@ export function Header() {
                   color="#9333ea"
                   speed="1.8s"
                   thickness={1}
-                  className="cursor-pointer no-underline transition-all duration-500 transform hover:scale-125"
+                  className="cursor-pointer no-underline transition-all duration-500 transform hover:scale-110"
                   innerClassName="relative z-1 backdrop-blur-md bg-white/20 border border-purple-400/40 text-black hover:bg-black/90 hover:text-white hover:border-purple-300/60 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-500 px-6 py-3 text-sm font-semibold rounded-[20px] text-center"
                   style={{ textDecoration: 'none' }}
                 >

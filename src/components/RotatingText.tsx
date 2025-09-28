@@ -2,11 +2,11 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 import {
   motion,
   AnimatePresence,
-  Transition,
   type VariantLabels,
   type Target,
   type TargetAndTransition
 } from 'motion/react';
+import type { Transition } from 'motion/react';
 
 function cn(...classes: (string | undefined | null | boolean)[]): string {
   return classes.filter(Boolean).join(' ');

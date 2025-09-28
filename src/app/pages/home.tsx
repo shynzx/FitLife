@@ -3,23 +3,32 @@ import { Breadcrumb } from '../../components/Breadcrumb';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import SpotlightCard from '../../components/SpotlightCard';
 import SplashCursor from '../../components/SplashCursor';
+import TextType from '../../components/TextType';
+import BlurText from '../../components/BlurText';
+import RotatingText from '../../components/RotatingText';
+import CircularGallery from '../../components/CircularGallery';
 
 export function Home() {
   // Cambiar el título de la página
   useDocumentTitle('Inicio - FitLife');
+
+  // Función callback para cuando complete la animación
+  const handleAnimationComplete = () => {
+    console.log('Animation completed!');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
       {/* SplashCursor - Efecto de fluido interactivo detrás de todo */}
       <div className="fixed inset-0 z-10">
         <SplashCursor
-          SPLAT_FORCE={6000}
-          SPLAT_RADIUS={0.15}
-          DENSITY_DISSIPATION={4}
-          VELOCITY_DISSIPATION={2}
+          SPLAT_FORCE={3000}
+          SPLAT_RADIUS={0.08}
+          DENSITY_DISSIPATION={6}
+          VELOCITY_DISSIPATION={3}
           TRANSPARENT={true}
-          SHADING={true}
-          COLOR_UPDATE_SPEED={8}
+          SHADING={false}
+          COLOR_UPDATE_SPEED={4}
         />
       </div>
       
@@ -28,20 +37,58 @@ export function Home() {
         <Header />
         <Breadcrumb />
         
-        <main className="w-full mx-auto px-6 py-8">
+        <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Bienvenido a FitLife
+            <TextType
+              text={["Bienvenido a FitLife", "Tu plataforma fitness", "Alcanza tus metas"]}
+              typingSpeed={100}
+              deletingSpeed={50}
+              pauseDuration={2000}
+              loop={true}
+              showCursor={true}
+              cursorCharacter="|"
+              cursorClassName="text-blue-600"
+              textColors={["#1f2937", "#3b82f6", "#059669"]}
+            />
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
-            Tu compañero perfecto para alcanzar tus objetivos de fitness y bienestar.
-            Planifica rutinas, medita, calcula tus necesidades y encuentra los mejores lugares.
-          </p>
+          <BlurText
+            text="Tu compañero perfecto para alcanzar tus objetivos de fitness y bienestar. Planifica rutinas, medita, calcula tus necesidades y encuentra los mejores lugares."
+            className="text-xl text-gray-600 max-w-2xl mx-auto mb-6"
+            animateBy="words"
+            delay={150}
+            direction="top"
+            threshold={0.1}
+            onAnimationComplete={handleAnimationComplete}
+          />
           
           {/* Textos motivacionales rotativos */}
           <div className="text-center">
-            <div className="px-2 sm:px-2 md:px-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg text-xl font-semibold inline-block">
-              💪 Cada día es una oportunidad para ser mejor
+            <div className="inline-flex items-center">
+              <span className="px-2 text-gray-800 text-xl font-semibold">
+                FitLife es
+              </span>
+              <RotatingText
+                texts={[
+                  "Motivación",
+                  "Progreso",
+                  "Disciplina",
+                  "Constancia",
+                  "Bienestar"
+                ]}
+                mainClassName="px-2 sm:px-2 md:px-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white overflow-hidden py-0.5 sm:py-1 md:py-2 rounded-lg text-xl font-semibold"
+                staggerFrom="last"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "-120%" }}
+                staggerDuration={0.025}
+                splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                rotationInterval={4000}
+                splitBy="words"
+                loop={true}
+                auto={true}
+              />
             </div>
           </div>
         </div>
@@ -119,9 +166,24 @@ export function Home() {
             Únete a miles de usuarios que ya han transformado su vida con FitLife. 
             Herramientas completas para tu bienestar físico y mental.
           </p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200">
-            Explorar Funciones
-          </button>
+          <div className="h-96 w-full">
+            <CircularGallery
+              items={[
+                { image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop', text: 'Mi Rutina' },
+                { image: 'https://images.unsplash.com/photo-1506629905607-74f3dd7b2851?w=400&h=400&fit=crop', text: 'Meditación' },
+                { image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop', text: 'Calculadora' },
+                { image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&fit=crop', text: 'Mapa' },
+                { image: 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=400&fit=crop', text: 'Nutrición' },
+                { image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=400&fit=crop', text: 'Progreso' }
+              ]}
+              bend={2.5}
+              textColor="#1f2937"
+              borderRadius={0.1}
+              font="bold 24px system-ui"
+              scrollSpeed={1.5}
+              scrollEase={0.08}
+            />
+          </div>
         </div>
       </main>
       </div>

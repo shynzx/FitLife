@@ -18,6 +18,7 @@ export function Breadcrumb() {
     '/nutricion': 'Nutrición',
     '/progreso': 'Progreso',
     '/meditacion': 'Meditación',
+    '/mapa': 'Mapa',
     '/comunidad': 'Comunidad',
     '/desafios': 'Desafíos'
   };
