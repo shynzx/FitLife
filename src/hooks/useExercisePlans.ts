@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   exercisePlanService, 
   exerciseService, 
@@ -30,14 +30,7 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
   const currentUser = authService.getCurrentUser();
   const userId = currentUser?.id;
 
-  console.log('🔍 useExercisePlans Debug:', {
-    currentUser,
-    userId,
-    isAuthenticated: authService.isAuthenticated(),
-    tokenExists: !!localStorage.getItem('authToken')
-  });
-
-  const refreshPlans = async () => {
+  const refreshPlans = useCallback(async () => {
     if (!userId) {
       setError('Usuario no autenticado');
       setIsLoading(false);
@@ -64,9 +57,9 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId]);
 
-  const createPlan = async (planData: Omit<CreateExercisePlanRequest, 'userId'>) => {
+  const createPlan = useCallback(async (planData: Omit<CreateExercisePlanRequest, 'userId'>) => {
     if (!userId) {
       throw new Error('Usuario no autenticado');
     }
@@ -83,9 +76,9 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
       setError(err.message || 'Error al crear el plan de ejercicio');
       throw err;
     }
-  };
+  }, [userId]);
 
-  const updatePlan = async (id: string, planData: Partial<CreateExercisePlanRequest>) => {
+  const updatePlan = useCallback(async (id: string, planData: Partial<CreateExercisePlanRequest>) => {
     try {
       setError(null);
       const updatedPlan = await exercisePlanService.updateExercisePlan(id, planData);
@@ -95,9 +88,9 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
       setError(err.message || 'Error al actualizar el plan de ejercicio');
       throw err;
     }
-  };
+  }, []);
 
-  const deletePlan = async (id: string) => {
+  const deletePlan = useCallback(async (id: string) => {
     try {
       setError(null);
       await exercisePlanService.deleteExercisePlan(id);
@@ -107,9 +100,9 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
       setError(err.message || 'Error al eliminar el plan de ejercicio');
       throw err;
     }
-  };
+  }, []);
 
-  const addExerciseToPlan = async (planId: string, exerciseData: Omit<CreateExerciseRequest, 'exercisePlanId'>) => {
+  const addExerciseToPlan = useCallback(async (planId: string, exerciseData: Omit<CreateExerciseRequest, 'exercisePlanId'>) => {
     try {
       setError(null);
       const newExercise = await exerciseService.createExercise({
@@ -128,9 +121,9 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
       setError(err.message || 'Error al agregar ejercicio al plan');
       throw err;
     }
-  };
+  }, []);
 
-  const removeExerciseFromPlan = async (exerciseId: string, planId: string) => {
+  const removeExerciseFromPlan = useCallback(async (exerciseId: string, planId: string) => {
     try {
       setError(null);
       await exerciseService.deleteExercise(exerciseId);
@@ -146,15 +139,15 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
       setError(err.message || 'Error al eliminar ejercicio del plan');
       throw err;
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (userId) {
       refreshPlans();
     }
-  }, [userId]);
+  }, [userId, refreshPlans]);
 
-  return {
+  return useMemo(() => ({
     plans,
     isLoading,
     error,
@@ -164,5 +157,15 @@ export const useExercisePlans = (): UseExercisePlansReturn => {
     addExerciseToPlan,
     removeExerciseFromPlan,
     refreshPlans
-  };
+  }), [
+    plans,
+    isLoading,
+    error,
+    createPlan,
+    updatePlan,
+    deletePlan,
+    addExerciseToPlan,
+    removeExerciseFromPlan,
+    refreshPlans
+  ]);
 };

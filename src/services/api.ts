@@ -1,5 +1,4 @@
 import { config } from '../config';
-import { APIDebugger } from '../utils/apiDebugger';
 
 // Configuración base de la API
 const API_BASE_URL = config.API_BASE_URL;
@@ -170,13 +169,7 @@ async function apiRequest<T>(
   }
 
   try {
-    // Debug: Log the request
-    APIDebugger.logRequest(url, requestConfig, options.body);
-    
     const response = await fetch(url, requestConfig);
-    
-    // Debug: Log basic response info
-    console.log('📨 Response:', response.status, response.statusText);
     
     return await handleResponse<T>(response);
   } catch (error) {
