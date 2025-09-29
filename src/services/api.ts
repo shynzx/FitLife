@@ -210,8 +210,51 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
+    console.log('🔍 logout - Iniciando limpieza...');
+    
+    // Obtener el usuario actual antes de limpiar
+    const currentUser = this.getCurrentUser();
+    const currentUserId = currentUser?.id;
+    
+    console.log('🔍 logout - Usuario actual:', currentUserId);
+    console.log('🔍 logout - localStorage antes:', { 
+      token: localStorage.getItem(config.AUTH.TOKEN_KEY), 
+      user: localStorage.getItem(config.AUTH.USER_KEY) 
+    });
+    
+    // Limpiar tokens y datos de usuario
     localStorage.removeItem(config.AUTH.TOKEN_KEY);
     localStorage.removeItem(config.AUTH.USER_KEY);
+    
+    // NO eliminar planes del usuario - queremos que persistan
+    // Solo limpiar datos de sesión temporales
+    console.log('🔍 logout - Manteniendo planes del usuario para persistencia');
+    
+    // Limpiar datos específicos de la app que son temporales
+    localStorage.removeItem('fitlife-dayExercises');
+    localStorage.removeItem('fitlife-localPlans'); // Datos globales antiguos
+    
+    // Limpiar cualquier otro dato de sesión temporal
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      // Solo limpiar datos temporales, NO los planes de usuario
+      if (key && key.startsWith('fitlife-') && !key.match(/^fitlife-plans-/)) {
+        keysToRemove.push(key);
+      }
+      // Limpiar datos de auth temporales
+      if (key && key.startsWith('auth') && key !== config.AUTH.TOKEN_KEY && key !== config.AUTH.USER_KEY) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    console.log('🔍 logout - localStorage después:', { 
+      token: localStorage.getItem(config.AUTH.TOKEN_KEY), 
+      user: localStorage.getItem(config.AUTH.USER_KEY),
+      keysRemoved: keysToRemove,
+      planesMantenidos: 'Los planes del usuario se mantienen para persistencia'
+    });
   },
 
   async refreshToken(): Promise<LoginResponse> {
@@ -222,14 +265,22 @@ export const authService = {
 
   // Guardar datos de usuario en localStorage
   saveUserSession(token: string, user: any): void {
+    console.log('🔍 saveUserSession - Guardando:', { token: token.substring(0, 20) + '...', user });
     localStorage.setItem(config.AUTH.TOKEN_KEY, token);
-    localStorage.setItem(config.AUTH.USER_KEY, JSON.stringify(user));
+    if (user) {
+      localStorage.setItem(config.AUTH.USER_KEY, JSON.stringify(user));
+      console.log('🔍 saveUserSession - Usuario guardado en localStorage');
+    } else {
+      console.log('🔍 saveUserSession - Sin datos de usuario para guardar');
+    }
   },
 
   // Obtener usuario actual
   getCurrentUser(): any {
     const userStr = localStorage.getItem(config.AUTH.USER_KEY);
-    return userStr ? JSON.parse(userStr) : null;
+    const user = userStr ? JSON.parse(userStr) : null;
+    console.log('🔍 getCurrentUser - Datos desde localStorage:', { userStr, user });
+    return user;
   },
 
   // Verificar si el usuario está autenticado

@@ -1,9 +1,14 @@
 import { RouterProvider } from 'react-router-dom';
 import { router } from './app/router';
+import { NotificationProvider } from './contexts/NotificationContext';
 import './App.css';
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <NotificationProvider>
+      <RouterProvider router={router} />
+    </NotificationProvider>
+  );
 }
 
 export default App;

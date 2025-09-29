@@ -144,7 +144,7 @@ export function InicioSesion() {
         const result = await auth.verifyOTP({ email, otpCode: otpValue });
         
         if (result.success) {
-          setShowOTPDialog(false);
+          setShowOTPDialog(false)
           navigate('/home');
         } else {
           setAlertMessage(result.message || "Código OTP inválido");
@@ -371,12 +371,7 @@ export function InicioSesion() {
             
             {/* Enlace temporal para probar la página Home */}
             <div className="mt-4 text-center">
-              <Link 
-                to="/home" 
-                className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
-              >
-                Ir a la página principal →
-              </Link>
+          
             </div>
           </div>
         </CardContent>

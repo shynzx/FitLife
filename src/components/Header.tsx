@@ -1,4 +1,4 @@
-import { Calendar, User, Calculator, Map, UserCircle } from 'lucide-react'
+import { Calendar, User, Calculator, Map, UserCircle, LogOut } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   HoverCard,
@@ -9,7 +9,15 @@ import StarBorder from './StarBorder'
 import { useAuth } from '../hooks/useAuth'
 
 export function Header() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
+
+  // Debug: Ver qué datos del usuario tenemos
+  console.log('🔍 Header - Datos del usuario:', {
+    isAuthenticated,
+    user,
+    userFromLocalStorage: localStorage.getItem('user'),
+    tokenFromLocalStorage: localStorage.getItem('authToken')
+  });
 
   return (
     <header className="relative bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-3">
@@ -135,10 +143,41 @@ export function Header() {
         {/* User Avatar o Botones de Auth */}
         <div className="flex items-center">
           {isAuthenticated ? (
-            // Usuario autenticado - mostrar avatar
-            <div className="p-2 cursor-pointer transition-all duration-200 hover:scale-110">
-              <UserCircle size={32} className="text-black" />
-            </div>
+            // Usuario autenticado - mostrar avatar con menú
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <div className="p-2 cursor-pointer transition-all duration-200 hover:scale-110">
+                  <UserCircle size={32} className="text-black" />
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-64" align="end">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <UserCircle size={24} className="text-gray-600" />
+                    <div>
+                      <h4 className="text-sm font-semibold">
+                        {user?.name || user?.email || 'Usuario'}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t border-gray-200 pt-3">
+                   
+                    
+                    <button
+                      onClick={() => logout()}
+                      className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200"
+                    >
+                      <LogOut size={16} />
+                      <span>Cerrar sesión</span>
+                    </button>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           ) : (
             // Usuario no autenticado - mostrar botones
             <div className="flex items-center space-x-3">

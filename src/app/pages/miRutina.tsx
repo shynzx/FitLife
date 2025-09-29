@@ -4,9 +4,12 @@ import { Breadcrumb } from '../../components/Breadcrumb';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useExercisePlans } from '../../hooks/useExercisePlans';
 import { useAuth } from '../../hooks/useAuth';
+import { useAppNotifications } from '../../contexts/NotificationContext';
+import { useExerciseReminder } from '../../hooks/useExerciseReminder';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { ChevronLeft, Plus, Check, Calendar, Clock, Trash2, Target, Zap, Loader2 } from 'lucide-react';
+import { ExerciseReminderModal } from '../../components/ui/exercise-reminder-modal';
+import { ChevronLeft, Plus, Check, Calendar, Clock, Trash2, Target, Zap, Loader2, AlarmClock, X } from 'lucide-react';
 import SpotlightCard from '../../components/SpotlightCard';
 
 interface Exercise {
@@ -96,6 +99,39 @@ export function MiRutina() {
   
   // Verificar autenticación
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  
+  // Hook de notificaciones
+  const notifications = useAppNotifications();
+  
+  // Hook de recordatorios de ejercicio
+  const reminder = useExerciseReminder();
+  
+  // Estado del modal de recordatorio
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  
+  // Listener para el evento de recordatorio
+  useEffect(() => {
+    const handleExerciseReminder = () => {
+      console.log('🔔 Evento de recordatorio recibido - abriendo modal');
+      setShowReminderModal(true);
+      notifications.showSuccess('⏰ ¡Es hora de entrenar!', 'Tu recordatorio de ejercicio está listo');
+      
+      // Asegurar que el modal se muestre con un pequeño delay
+      setTimeout(() => {
+        setShowReminderModal(true);
+      }, 100);
+    };
+
+    // Agregar listener para el evento personalizado
+    window.addEventListener('exerciseReminder', handleExerciseReminder);
+    
+    console.log('👂 Listener de recordatorio de ejercicio configurado');
+    
+    return () => {
+      window.removeEventListener('exerciseReminder', handleExerciseReminder);
+      console.log('🚫 Listener de recordatorio removido');
+    };
+  }, [notifications]);
   
   // API Hook
   const { 
@@ -340,6 +376,16 @@ export function MiRutina() {
   };
 
   const handleFinishSchedule = async () => {
+    // Verificar autenticación antes de proceder
+    if (!isAuthenticated) {
+      setCreateError('Debes estar autenticado para crear rutinas');
+      setTimeout(() => setCreateError(''), 5000);
+      return;
+    }
+
+    // Debug: Verificar estado de autenticación
+    console.log('🔍 Creando rutina para usuario autenticado');
+
     try {
       setIsCreatingPlan(true);
       const createdPlans: Array<{
@@ -431,7 +477,7 @@ export function MiRutina() {
               
               addedExercises++;
             } catch (exerciseError) {
-              // Error silencioso
+              // Error silencioso - el hook maneja planes locales automáticamente
             }
           }
         }
@@ -451,9 +497,15 @@ export function MiRutina() {
       setSuccessMessage(`¡Rutina creada exitosamente para ${selectedDaysForExercises.length} día${selectedDaysForExercises.length > 1 ? 's' : ''}! Los ejercicios se están agregando...`);
       setTimeout(() => setSuccessMessage(''), 10000); // Ocultar después de 10 segundos
       
+      // Notificación de éxito
+      notifications.notifyPlanCreated(`Rutina para ${selectedDaysForExercises.length} día${selectedDaysForExercises.length > 1 ? 's' : ''}`);
+      
     } catch (err) {
       setCreateError('Error al crear la rutina. Por favor intenta de nuevo.');
       setTimeout(() => setCreateError(''), 5000);
+      
+      // Notificación de error
+      notifications.notifyError('Error al crear rutina', 'No se pudo crear la rutina. Por favor intenta de nuevo.');
     } finally {
       setIsCreatingPlan(false);
     }
@@ -461,14 +513,22 @@ export function MiRutina() {
 
   const handleRemoveExercise = useCallback((dayKey: string, exerciseIndex: number) => {
     const newDayExercises = { ...dayExercises };
+    let removedExerciseName = '';
+    
     if (newDayExercises[dayKey]) {
+      // Obtener el nombre del ejercicio antes de eliminarlo
+      removedExerciseName = newDayExercises[dayKey][exerciseIndex]?.name || 'ejercicio';
+      
       newDayExercises[dayKey] = newDayExercises[dayKey].filter((_, index) => index !== exerciseIndex);
       if (newDayExercises[dayKey].length === 0) {
         delete newDayExercises[dayKey];
       }
+      
+      // Notificación de eliminación
+      notifications.notifyExerciseRemoved(removedExerciseName);
     }
     setDayExercises(newDayExercises);
-  }, [dayExercises]);
+  }, [dayExercises, notifications]);
 
   const filteredExercises = useMemo(() => 
     selectedCategory === 'all' 
@@ -480,6 +540,64 @@ export function MiRutina() {
   const getTotalExercisesCount = useCallback(() => {
     return Object.values(dayExercises).reduce((total, exercises) => total + exercises.length, 0);
   }, [dayExercises]);
+
+  // Función para programar recordatorio
+  const handleScheduleReminder = useCallback(() => {
+    const currentTime = new Date();
+    const defaultTime = new Date(currentTime.getTime() + 5 * 60000); // 5 minutos desde ahora
+    const timeString = defaultTime.toTimeString().slice(0, 5); // HH:MM format
+    
+    const userTime = prompt(
+      `🕐 ¿A qué hora quieres que te recordemos hacer ejercicio?\n\nFormato: HH:MM (ejemplo: 14:30)\n\nSugerencia: ${timeString}\n\n💡 Tip: Usa "test" para probar inmediatamente`,
+      timeString
+    );
+    
+    if (userTime) {
+      // Función especial para probar inmediatamente
+      if (userTime.toLowerCase() === 'test') {
+        setTimeout(() => {
+          setShowReminderModal(true);
+          notifications.showSuccess('⏰ ¡Modal de prueba!', 'Este es el modal que aparecerá a la hora programada');
+        }, 1000);
+        return;
+      }
+      
+      // Validar formato de hora
+      const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+      if (timeRegex.test(userTime)) {
+        reminder.setScheduledTime(userTime);
+        reminder.scheduleNotification();
+        notifications.showSuccess(
+          '⏰ Recordatorio programado', 
+          `Te notificaremos a las ${userTime} para hacer ejercicio`
+        );
+      } else {
+        notifications.showError(
+          'Formato de hora inválido', 
+          'Por favor usa el formato HH:MM (ejemplo: 14:30)'
+        );
+      }
+    }
+  }, [reminder, notifications, setShowReminderModal]);
+
+  // Función para manejar snooze (posponer 10 minutos)
+  const handleSnooze = useCallback(() => {
+    const now = new Date();
+    const snoozeTime = new Date(now.getTime() + 10 * 60000); // 10 minutos
+    const timeString = snoozeTime.toTimeString().slice(0, 5);
+    
+    reminder.setScheduledTime(timeString);
+    reminder.scheduleNotification();
+    setShowReminderModal(false);
+    
+    notifications.showInfo('⏰ Recordatorio pospuesto', 'Te recordaremos en 10 minutos');
+  }, [reminder, notifications]);
+
+  // Función para cerrar modal y cancelar recordatorio
+  const handleCloseModal = useCallback(() => {
+    setShowReminderModal(false);
+    notifications.showSuccess('�️ ¡Excelente!', '¡A entrenar se ha dicho!');
+  }, [notifications]);
 
   const renderCalendarView = () => (
     <div className="space-y-8">
@@ -508,6 +626,48 @@ export function MiRutina() {
               {getTotalExercisesCount()} ejercicios totales
             </span>
           </div>
+        </div>
+        
+        {/* Botones de notificaciones y recordatorios */}
+        <div className="flex justify-center gap-3 mt-4 flex-wrap">
+          <Button
+            onClick={handleScheduleReminder}
+            variant="outline"
+            size="sm"
+            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-none shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            <AlarmClock className="w-4 h-4 mr-2" />
+            Notificarme
+          </Button>
+          
+          <Button
+            onClick={() => setShowReminderModal(true)}
+            variant="outline"
+            size="sm"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-none shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            <Calendar className="w-4 h-4 mr-2" />
+            Probar Modal
+          </Button>
+          
+          {reminder.isScheduled && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-green-100 dark:bg-green-900/30 rounded-full text-sm">
+              <Clock className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <span className="text-green-700 dark:text-green-300 font-medium">
+                En {reminder.timeUntilNotification}
+              </span>
+              <Button
+                onClick={reminder.cancelNotification}
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 text-green-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          )}
+          
+         
         </div>
       </div>
 
@@ -549,6 +709,40 @@ export function MiRutina() {
         <div className="flex justify-center items-center py-4">
           <div className="px-6 py-3 bg-green-100 dark:bg-green-900/30 rounded-full border border-green-200 dark:border-green-800">
             <span className="text-green-700 dark:text-green-300 font-medium">{successMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Mensaje amigable para cuenta nueva sin planes */}
+      {!isLoading && !error && plans.length === 0 && (
+        <div className="flex justify-center items-center py-6">
+          <div className="px-8 py-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-700 max-w-md text-center">
+            <div className="flex items-center justify-center mb-3">
+              <Calendar className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
+              ¡Bienvenido a FitLife!
+            </h3>
+            <p className="text-sm text-blue-600 dark:text-blue-300 mb-4">
+              Parece que es tu primera vez aquí. Comienza creando tu primera rutina de ejercicios seleccionando un día y agregando ejercicios.
+            </p>
+            <div className="text-xs text-blue-500 dark:text-blue-400">
+              💡 Tip: Haz clic en cualquier día del calendario para empezar
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mensaje informativo para modo local */}
+      {plans.some(plan => plan.id.startsWith('local-')) && (
+        <div className="flex justify-center items-center py-4">
+          <div className="px-6 py-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-700 max-w-2xl text-center">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+              <span className="text-yellow-700 dark:text-yellow-300 font-medium text-sm">
+                Funcionando en modo local - Tus rutinas se guardan en tu dispositivo
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -965,6 +1159,13 @@ export function MiRutina() {
           {currentView === 'schedule' && renderScheduleView()}
         </main>
       </div>
+      
+      {/* Modal de recordatorio de ejercicio */}
+      <ExerciseReminderModal
+        isOpen={showReminderModal}
+        onClose={handleCloseModal}
+        onSnooze={handleSnooze}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { authService, userService, APIError } from '../services/api';
-import { getUserIdFromToken } from '../utils/jwt';
+import { config } from '../config';
 import type { LoginRequest, OTPRequest, User, RegisterRequest } from '../services/api';
 
 // Función para generar un UUID temporal válido (fallback)
@@ -11,6 +11,21 @@ function generateTempUUID(): string {
     return v.toString(16);
   });
 }
+
+// Función para decodificar token JWT (solo para debug)
+const decodeJWTPayload = (token: string) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decodificando JWT:', error);
+    return null;
+  }
+};
 
 export interface AuthState {
   isAuthenticated: boolean;
@@ -33,17 +48,150 @@ export function useAuth() {
   }, []);
 
   const checkAuthStatus = async () => {
+    console.log('🔍 checkAuthStatus - Iniciando verificación');
+    
     try {
       const isAuth = authService.isAuthenticated();
-      const user = authService.getCurrentUser();
+      console.log('🔍 checkAuthStatus - isAuthenticated:', isAuth);
       
-      setAuthState({
-        isAuthenticated: isAuth,
-        user,
-        isLoading: false,
-        error: null,
-      });
+      if (isAuth) {
+        // Primero intentar obtener datos desde localStorage
+        const localUser = authService.getCurrentUser();
+        console.log('🔍 checkAuthStatus - Datos locales:', localUser);
+        
+        if (localUser && localUser.email) {
+          // Si tenemos datos locales válidos, usarlos directamente
+          console.log('🔍 checkAuthStatus - Usando datos locales válidos');
+          setAuthState({
+            isAuthenticated: true,
+            user: localUser,
+            isLoading: false,
+            error: null,
+          });
+          return;
+        }
+        
+        // Solo si no hay datos locales, intentar obtener desde API
+        try {
+          console.log('🔍 checkAuthStatus - Obteniendo datos del usuario desde API...');
+          const userData = await userService.getCurrentUser();
+          console.log('🔍 checkAuthStatus - Datos del usuario desde API:', userData);
+          
+          // Verificar consistencia (solo para debug, no fallar aquí)
+          const token = localStorage.getItem(config.AUTH.TOKEN_KEY);
+          if (token) {
+            const tokenPayload = decodeJWTPayload(token);
+            if (tokenPayload?.email && tokenPayload.email !== userData.email) {
+              console.warn('⚠️ Inconsistencia detectada entre token y API, usando datos del token');
+              
+              // Crear usuario basado en el token
+              const tokenUser = {
+                id: tokenPayload.sub || generateTempUUID(),
+                email: tokenPayload.email,
+                name: tokenPayload.email.split('@')[0],
+                firstName: tokenPayload.email.split('@')[0],
+                lastName: '',
+                username: null,
+                weight: null,
+                height: null,
+                age: null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              };
+              
+              authService.saveUserSession(token, tokenUser);
+              setAuthState({
+                isAuthenticated: true,
+                user: tokenUser,
+                isLoading: false,
+                error: null,
+              });
+              return;
+            }
+          }
+          
+          // Si la API es consistente, procesar datos normalmente
+          const user = {
+            id: userData.id,
+            email: userData.email,
+            name: `${userData.firstName} ${userData.lastName}`.trim(),
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            username: userData.username,
+            weight: userData.weight,
+            height: userData.height,
+            age: userData.age,
+            createdAt: userData.createdAt,
+            updatedAt: userData.updatedAt
+          };
+          
+          console.log('🔍 checkAuthStatus - Usuario procesado:', user);
+          
+          // Actualizar localStorage con datos frescos
+          const currentToken = localStorage.getItem(config.AUTH.TOKEN_KEY);
+          if (currentToken) {
+            authService.saveUserSession(currentToken, user);
+          }
+          
+          setAuthState({
+            isAuthenticated: true,
+            user,
+            isLoading: false,
+            error: null,
+          });
+        } catch (error) {
+          console.error('❌ checkAuthStatus - Error al verificar usuario:', error);
+          
+          // En caso de error de API, usar datos del token si están disponibles
+          const token = localStorage.getItem(config.AUTH.TOKEN_KEY);
+          if (token) {
+            const tokenPayload = decodeJWTPayload(token);
+            if (tokenPayload?.email) {
+              const tokenUser = {
+                id: tokenPayload.sub || generateTempUUID(),
+                email: tokenPayload.email,
+                name: tokenPayload.email.split('@')[0],
+                firstName: tokenPayload.email.split('@')[0],
+                lastName: '',
+                username: null,
+                weight: null,
+                height: null,
+                age: null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              };
+              
+              authService.saveUserSession(token, tokenUser);
+              setAuthState({
+                isAuthenticated: true,
+                user: tokenUser,
+                isLoading: false,
+                error: null,
+              });
+              return;
+            }
+          }
+          
+          // Si todo falla, cerrar sesión
+          authService.logout();
+          setAuthState({
+            isAuthenticated: false,
+            user: null,
+            isLoading: false,
+            error: null,
+          });
+        }
+      } else {
+        console.log('🔍 checkAuthStatus - Usuario no autenticado');
+        setAuthState({
+          isAuthenticated: false,
+          user: null,
+          isLoading: false,
+          error: null,
+        });
+      }
     } catch (error) {
+      console.error('❌ checkAuthStatus - Error general:', error);
       setAuthState({
         isAuthenticated: false,
         user: null,
@@ -54,23 +202,59 @@ export function useAuth() {
   };
 
   const login = async (credentials: LoginRequest) => {
+    console.log('🔍 Login - Iniciando con credenciales:', { email: credentials.email });
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
       // Limpiar sesión anterior completamente
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+      console.log('🔍 Login - Limpiando sesión anterior...');
+      await authService.logout();
       
+      console.log('🔍 Login - Llamando API de login...');
       const response = await authService.login(credentials);
+      console.log('🔍 Login - Respuesta de login:', response);
       
       // Tu API devuelve { token: "...", expires: "..." } sin campo "success"
       if (response.token) {
         // Guardar el token primero
+        console.log('🔍 Login - Guardando token...');
         authService.saveUserSession(response.token, null);
+        
+        // VERIFICAR TOKEN JWT
+        const tokenPayload = decodeJWTPayload(response.token);
+        console.log('🔍 Login - Payload del token JWT:', tokenPayload);
+        console.log('🔍 Login - Email en token:', tokenPayload?.email);
+        console.log('🔍 Login - Email de login:', credentials.email);
+        
+        if (tokenPayload?.email && tokenPayload.email !== credentials.email) {
+          console.error('🚨 ERROR: El token JWT contiene un email diferente!');
+          console.error('  Token email:', tokenPayload.email);
+          console.error('  Login email:', credentials.email);
+          await authService.logout();
+          throw new Error(`Error de autenticación: Token JWT con email incorrecto`);
+        }
         
         try {
           // Obtener información completa del usuario de la API
+          console.log('🔍 Login - Obteniendo datos del usuario...');
           const userData = await userService.getCurrentUser();
+          console.log('🔍 Login - Datos del usuario obtenidos:', userData);
+          
+          // VALIDACIÓN CRÍTICA: Verificar que el email coincida
+          console.log('🔍 VERIFICANDO CONSISTENCIA DE EMAILS:');
+          console.log('  📧 Email usado para login:', credentials.email);
+          console.log('  📧 Email en respuesta del servidor:', userData.email);
+          console.log('  📧 ¿Son iguales?', credentials.email === userData.email);
+          
+          if (credentials.email !== userData.email) {
+            console.error('🚨 ERROR CRÍTICO: El servidor devolvió datos de otro usuario!');
+            console.error('  Expected:', credentials.email);
+            console.error('  Received:', userData.email);
+            
+            // Limpiar cualquier dato corrupto
+            await authService.logout();
+            throw new Error(`Error de autenticación: El servidor devolvió datos de otro usuario (esperado: ${credentials.email}, recibido: ${userData.email})`);
+          }
           
           // Crear objeto usuario con datos reales
           const user = {
@@ -87,8 +271,12 @@ export function useAuth() {
             updatedAt: userData.updatedAt
           };
           
+          console.log('🔍 Login - Usuario procesado:', user);
+          
           // Actualizar la sesión con datos completos
           authService.saveUserSession(response.token, user);
+          console.log('🔍 Login - Sesión guardada exitosamente');
+          
           setAuthState({
             isAuthenticated: true,
             user: user,
@@ -114,13 +302,25 @@ export function useAuth() {
         } catch (userError) {
           console.error('Error al obtener datos del usuario:', userError);
           
-          // Fallback: usar datos básicos del token JWT si falla la obtención del usuario
-          const userIdFromToken = getUserIdFromToken(response.token);
+          // Fallback: usar datos del token JWT que sabemos que son correctos
+          console.log('🔍 Usando datos del token JWT como fallback...');
+          const tokenPayload = decodeJWTPayload(response.token);
+          
           const fallbackUser = {
-            id: userIdFromToken || generateTempUUID(),
-            email: credentials.email,
-            name: credentials.email.split('@')[0]
+            id: tokenPayload?.sub || generateTempUUID(),
+            email: credentials.email, // Usar el email del login que sabemos que es correcto
+            name: credentials.email.split('@')[0],
+            firstName: credentials.email.split('@')[0],
+            lastName: '',
+            username: null,
+            weight: null,
+            height: null,
+            age: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           };
+          
+          console.log('🔍 Usuario fallback creado:', fallbackUser);
           
           authService.saveUserSession(response.token, fallbackUser);
           setAuthState({
@@ -130,7 +330,7 @@ export function useAuth() {
             error: null,
           });
           
-          console.log('⚠️ Login exitoso con datos limitados:', fallbackUser);
+          console.log('⚠️ Login exitoso con datos del token JWT:', fallbackUser);
           return { success: true, requiresOTP: false };
         }
       }
