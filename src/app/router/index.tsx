@@ -4,6 +4,9 @@ import { Registro } from '../pages/registro';
 import { Home } from '../pages/home';
 import { Meditacion } from '../pages/meditacion';
 import { Mapa } from '../pages/mapa';
+import { MiRutina } from '../pages/miRutina';
+import { Calculadora } from '../pages/calculadora';
+import { ApiTest } from '../pages/apiTest';
 import { NotFound } from '../pages/notFound';
 
 // Configuración de rutas
@@ -34,6 +37,18 @@ export const router = createBrowserRouter([
       {
         path: "mapa",
         element: <Mapa />,
+      },
+      {
+        path: "mi-rutina",
+        element: <MiRutina />,
+      },
+        {
+        path: "calculadora",
+        element: <Calculadora />,
+      },
+      {
+        path: "api-test",
+        element: <ApiTest />,
       },
       {
         path: "*", // Catch-all route para páginas no encontradas

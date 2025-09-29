@@ -13,7 +13,8 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '../../components/ui/input
 import { Loader2Icon, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 export function InicioSesion() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -28,8 +29,28 @@ export function InicioSesion() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   
+  // Hook de autenticación
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   // Cambiar el título de la página
   useDocumentTitle('Iniciar Sesión - FitLife');
+
+  // Redirigir si ya está autenticado
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      navigate('/home');
+    }
+  }, [auth.isAuthenticated, navigate]);
+
+  // Verificar si viene del registro exitoso para prellenar el email
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.registrationSuccess && state?.email) {
+      setEmail(state.email);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     // Trigger la animación después de que el componente se monte
@@ -54,13 +75,14 @@ export function InicioSesion() {
   };
 
   // Función para manejar el envío del formulario inicial
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Limpiar errores previos
     setEmailError("");
     setPasswordError("");
     setShowAlert(false);
+    auth.clearError();
 
     let hasErrors = false;
 
@@ -87,32 +109,53 @@ export function InicioSesion() {
       return;
     }
 
-    // Validar credenciales específicas
-    if (email === "herreraloezae@gmail.com" && password === "12345678") {
-      // Credenciales correctas - proceder con OTP
-      setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setShowOTPDialog(true);
-      }, 1500);
-    } else {
-      // Credenciales incorrectas - mostrar alert
-      setAlertMessage("Correo o contraseña incorrectos.\nPor favor, verifica tus credenciales.");
+    setIsSubmitting(true);
+
+    try {
+      const result = await auth.login({ email, password });
+      
+      if (result.success) {
+        if (result.requiresOTP) {
+          // Mostrar diálogo OTP
+          setShowOTPDialog(true);
+        } else {
+          // Login exitoso sin OTP, navegar al home
+          navigate('/home');
+        }
+      } else {
+        // Mostrar error
+        setAlertMessage(result.message || "Error al iniciar sesión");
+        setShowAlert(true);
+      }
+    } catch (error) {
+      setAlertMessage("Error de conexión. Verifica tu conexión a internet.");
       setShowAlert(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Función para manejar la verificación del código OTP
-  const handleOTPVerification = () => {
+  const handleOTPVerification = async () => {
     if (otpValue.length === 6) {
       setIsSubmitting(true);
-      // Simular verificación
-      setTimeout(() => {
+      
+      try {
+        const result = await auth.verifyOTP({ email, otpCode: otpValue });
+        
+        if (result.success) {
+          setShowOTPDialog(false);
+          navigate('/home');
+        } else {
+          setAlertMessage(result.message || "Código OTP inválido");
+          setShowAlert(true);
+        }
+      } catch (error) {
+        setAlertMessage("Error al verificar el código. Inténtalo de nuevo.");
+        setShowAlert(true);
+      } finally {
         setIsSubmitting(false);
-        setShowOTPDialog(false);
-        // Aquí redirigiríamos al dashboard
-        window.location.href = '/home';
-      }, 2000);
+      }
     }
   };
 
@@ -270,7 +313,7 @@ export function InicioSesion() {
               } ${
                 (!email.trim() || !password.trim()) 
                   ? '!bg-gray-400 !border-gray-400 !text-gray-600 hover:!bg-gray-400 hover:!border-gray-400 hover:!text-gray-600'
-                  : '!bg-black hover:!bg-white !border !border-black hover:!border-gray-300 !text-white hover:!text-black hover:scale-105'
+                  : '!bg-black hover:!bg-gray-800 !border !border-black hover:!border-gray-600 !text-white hover:!text-white hover:scale-105'
               }`}
               style={{
                 backgroundColor: isSubmitting ? '#374151' : (!email.trim() || !password.trim()) ? '#9CA3AF' : 'black',

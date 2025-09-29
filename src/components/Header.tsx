@@ -6,11 +6,10 @@ import {
   HoverCardTrigger,
 } from "./ui/hover-card"
 import StarBorder from './StarBorder'
+import { useAuth } from '../hooks/useAuth'
 
 export function Header() {
-  // Por ahora simularemos que el usuario no está autenticado
-  // En el futuro esto se conectará con tu sistema de autenticación
-  const isAuthenticated = false; // Cambiar a true cuando el usuario esté logueado
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="relative bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-3">
@@ -26,13 +25,13 @@ export function Header() {
         <nav className="flex items-center space-x-8">
           <HoverCard>
             <HoverCardTrigger asChild>
-              <div className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
+              <Link to="/mi-rutina" className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
                 <div className="flex items-center space-x-2">
                   <Calendar size={20} className="text-black" />
                   <span className="text-black font-medium">Mi rutina</span>
                 </div>
                 <div className="h-0.5 w-0 bg-black transition-all duration-200 group-hover:w-full"></div>
-              </div>
+              </Link>
             </HoverCardTrigger>
             <HoverCardContent className="w-80">
               <div className="space-y-2">
@@ -80,13 +79,13 @@ export function Header() {
 
           <HoverCard>
             <HoverCardTrigger asChild>
-              <div className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
+              <Link to="/calculadora" className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
                 <div className="flex items-center space-x-2">
                   <Calculator size={20} className="text-black" />
                   <span className="text-black font-medium">Calculadora</span>
                 </div>
                 <div className="h-0.5 w-0 bg-black transition-all duration-200 group-hover:w-full"></div>
-              </div>
+              </Link>
             </HoverCardTrigger>
             <HoverCardContent className="w-80">
               <div className="space-y-2">

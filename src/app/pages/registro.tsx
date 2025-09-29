@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,25 +10,39 @@ import {
   AlertDialogContent,
 } from '../../components/ui/alert-dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../../components/ui/input-otp';
-import { Loader2Icon, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Loader2Icon, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { useAuth } from '../../hooks/useAuth';
 
 export function Registro() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showOTPDialog, setShowOTPDialog] = useState(false);
   const [otpValue, setOtpValue] = useState("");
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  
+  const { register, clearError } = useAuth();
+  const navigate = useNavigate();
   
   // Cambiar el título de la página
   useDocumentTitle('Crear Cuenta - FitLife');
+
+  // Función para separar el nombre completo
+  const separateFullName = (fullName: string) => {
+    const nameParts = fullName.trim().split(' ').filter(part => part.length > 0);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || firstName; // Si no hay apellido, usar el nombre
+    return { firstName, lastName };
+  };
 
   useEffect(() => {
     // Trigger la animación después de que el componente se monte
@@ -41,23 +56,70 @@ export function Registro() {
   }, []);
 
   // Función para manejar el envío del formulario de registro
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name && email && password && confirmPassword) {
-      if (password !== confirmPassword) {
-        alert("Las contraseñas no coinciden");
-        return;
+    
+    // Validaciones básicas
+    if (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+      setError("Todos los campos son obligatorios");
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+    clearError();
+
+    try {
+      console.log('🔥 Llamando función register...');
+      
+      // Separar el nombre completo en firstName y lastName
+      const { firstName, lastName } = separateFullName(fullName);
+      console.log('📝 Nombre separado:', { fullName, firstName, lastName });
+      
+      const result = await register({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(), 
+        email: email.trim(),
+        password: password
+      });
+
+      console.log('🎯 Resultado del registro:', result);
+
+      if (result.success) {
+        setSuccessMessage(`¡Cuenta creada exitosamente! Redirigiendo al login...`);
+        
+        // Redirigir al login después de un breve retraso
+        setTimeout(() => {
+          navigate('/login', { 
+            state: { 
+              registrationSuccess: true,
+              email: email.trim()
+            } 
+          });
+        }, 1500);
+      } else {
+        console.log('❌ Resultado de registro:', result);
+        setError(result.message || 'Error al crear la cuenta');
       }
-      // Simular envío de código OTP
-      setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setShowOTPDialog(true);
-      }, 1500);
+    } catch (error: any) {
+      console.error('💥 Error capturado en el componente:', error);
+      setError(error?.message || 'Error de conexión al crear la cuenta');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Función para manejar la verificación del código OTP
+  // Función para manejar la verificación del código OTP (mantenida para compatibilidad)
   const handleOTPVerification = () => {
     if (otpValue.length === 6) {
       setIsSubmitting(true);
@@ -99,15 +161,15 @@ export function Registro() {
                 ? 'translate-y-0 opacity-100' 
                 : 'translate-y-6 opacity-0'
             }`}>
-              <Label htmlFor="name" className="text-gray-700 font-medium">
+              <Label htmlFor="fullName" className="text-gray-700 font-medium">
                 Nombre completo
               </Label>
               <Input
-                id="name"
+                id="fullName"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Tu nombre"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Tu nombre completo"
                 required
                 className="w-full h-12 border-gray-300 rounded-lg text-black placeholder:text-gray-400 hover:scale-105 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:scale-105 transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] autofill:bg-transparent autofill:shadow-[inset_0_0_0px_1000px_transparent]"
                 style={{
@@ -246,20 +308,20 @@ export function Registro() {
             
             <Button 
               type="submit"
-              disabled={isSubmitting || !name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()}
+              disabled={isSubmitting || !fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()}
               className={`w-full h-12 rounded-full font-medium transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] delay-[1200ms] disabled:cursor-not-allowed disabled:hover:scale-100 ${
                 isLoaded 
                   ? 'translate-y-0 opacity-100' 
                   : 'translate-y-6 opacity-0'
               } ${
-                (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) 
+                (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) 
                   ? '!bg-gray-400 !border-gray-400 !text-gray-600 hover:!bg-gray-400 hover:!border-gray-400 hover:!text-gray-600'
                   : '!bg-black hover:!bg-white !border !border-black hover:!border-gray-300 !text-white hover:!text-black hover:scale-105'
               }`}
               style={{
-                backgroundColor: isSubmitting ? '#374151' : (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) ? '#9CA3AF' : 'black',
-                color: (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) ? '#6B7280' : 'white',
-                border: (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) ? '1px solid #9CA3AF' : '1px solid black',
+                backgroundColor: isSubmitting ? '#374151' : (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) ? '#9CA3AF' : 'black',
+                color: (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) ? '#6B7280' : 'white',
+                border: (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) ? '1px solid #9CA3AF' : '1px solid black',
                 transition: 'all 400ms cubic-bezier(0.4, 0.0, 0.2, 1)'
               }}
             >
@@ -272,6 +334,35 @@ export function Registro() {
                 'Crear cuenta'
               )}
             </Button>
+
+            {/* Mensajes de error y éxito */}
+            {error && (
+              <Alert className="bg-red-50 border-red-200">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">
+                  {error}
+                  {error.includes('email ya está registrado') && (
+                    <div className="mt-2">
+                      <Link 
+                        to="/login" 
+                        className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
+                      >
+                        → Ir a iniciar sesión
+                      </Link>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {successMessage && (
+              <Alert className="bg-green-50 border-green-200">
+                <AlertCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-green-800">
+                  {successMessage}
+                </AlertDescription>
+              </Alert>
+            )}
           </form>
           
           <div className={` transition-all duration-700 ease-out delay-[1400ms] ${

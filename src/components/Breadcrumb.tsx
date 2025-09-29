@@ -19,6 +19,7 @@ export function Breadcrumb() {
     '/progreso': 'Progreso',
     '/meditacion': 'Meditación',
     '/mapa': 'Mapa',
+    '/mi-rutina': 'Mi Rutina',
     '/comunidad': 'Comunidad',
     '/desafios': 'Desafíos'
   };
