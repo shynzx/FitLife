@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Header } from '../../components/Header';
 import { Breadcrumb } from '../../components/Breadcrumb';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
@@ -47,47 +47,47 @@ const daysOfWeek = [
 const exerciseColors = [
   {
     selected: 'bg-gradient-to-br from-pink-500 via-pink-600 to-rose-600 hover:from-pink-600 hover:via-pink-700 hover:to-rose-700 text-white shadow-lg shadow-pink-500/40 border-pink-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-pink-50 dark:hover:bg-pink-900/20 text-gray-700 dark:text-gray-300 border-2 border-pink-200 dark:border-pink-700 hover:border-pink-400 dark:hover:border-pink-500 hover:shadow-md hover:shadow-pink-200/50 dark:hover:shadow-pink-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-pink-50 dark:hover:bg-pink-900/20 text-gray-700 dark:text-gray-300 border-2 border-pink-200 dark:border-pink-700 hover:border-pink-400 dark:hover:border-pink-500 hover:shadow-md hover:shadow-pink-200/50 dark:hover:shadow-pink-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-600 hover:via-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/40 border-emerald-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-300 border-2 border-emerald-200 dark:border-emerald-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md hover:shadow-emerald-200/50 dark:hover:shadow-emerald-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-300 border-2 border-emerald-200 dark:border-emerald-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md hover:shadow-emerald-200/50 dark:hover:shadow-emerald-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:via-orange-700 hover:to-amber-700 text-white shadow-lg shadow-orange-500/40 border-orange-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-gray-700 dark:text-gray-300 border-2 border-orange-200 dark:border-orange-700 hover:border-orange-400 dark:hover:border-orange-500 hover:shadow-md hover:shadow-orange-200/50 dark:hover:shadow-orange-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-orange-50 dark:hover:bg-orange-900/20 text-gray-700 dark:text-gray-300 border-2 border-orange-200 dark:border-orange-700 hover:border-orange-400 dark:hover:border-orange-500 hover:shadow-md hover:shadow-orange-200/50 dark:hover:shadow-orange-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/40 border-blue-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-700 dark:text-gray-300 border-2 border-blue-200 dark:border-blue-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-700 dark:text-gray-300 border-2 border-blue-200 dark:border-blue-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-purple-500 via-purple-600 to-violet-600 hover:from-purple-600 hover:via-purple-700 hover:to-violet-700 text-white shadow-lg shadow-purple-500/40 border-purple-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-700 dark:text-gray-300 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-700 dark:text-gray-300 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-red-500 via-red-600 to-pink-600 hover:from-red-600 hover:via-red-700 hover:to-pink-700 text-white shadow-lg shadow-red-500/40 border-red-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 border-2 border-red-200 dark:border-red-700 hover:border-red-400 dark:hover:border-red-500 hover:shadow-md hover:shadow-red-200/50 dark:hover:shadow-red-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 border-2 border-red-200 dark:border-red-700 hover:border-red-400 dark:hover:border-red-500 hover:shadow-md hover:shadow-red-200/50 dark:hover:shadow-red-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-yellow-500 via-yellow-600 to-orange-500 hover:from-yellow-600 hover:via-yellow-700 hover:to-orange-600 text-white shadow-lg shadow-yellow-500/40 border-yellow-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 text-gray-700 dark:text-gray-300 border-2 border-yellow-200 dark:border-yellow-700 hover:border-yellow-400 dark:hover:border-yellow-500 hover:shadow-md hover:shadow-yellow-200/50 dark:hover:shadow-yellow-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-yellow-50 dark:hover:bg-yellow-900/20 text-gray-700 dark:text-gray-300 border-2 border-yellow-200 dark:border-yellow-700 hover:border-yellow-400 dark:hover:border-yellow-500 hover:shadow-md hover:shadow-yellow-200/50 dark:hover:shadow-yellow-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 hover:from-indigo-600 hover:via-indigo-700 hover:to-blue-700 text-white shadow-lg shadow-indigo-500/40 border-indigo-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 border-2 border-indigo-200 dark:border-indigo-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-gray-700 dark:text-gray-300 border-2 border-indigo-200 dark:border-indigo-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-teal-500 via-teal-600 to-cyan-600 hover:from-teal-600 hover:via-teal-700 hover:to-cyan-700 text-white shadow-lg shadow-teal-500/40 border-teal-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-teal-50 dark:hover:bg-teal-900/20 text-gray-700 dark:text-gray-300 border-2 border-teal-200 dark:border-teal-700 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-md hover:shadow-teal-200/50 dark:hover:shadow-teal-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-teal-50 dark:hover:bg-teal-900/20 text-gray-700 dark:text-gray-300 border-2 border-teal-200 dark:border-teal-700 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-md hover:shadow-teal-200/50 dark:hover:shadow-teal-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-cyan-500 via-cyan-600 to-blue-500 hover:from-cyan-600 hover:via-cyan-700 hover:to-blue-600 text-white shadow-lg shadow-cyan-500/40 border-cyan-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 text-gray-700 dark:text-gray-300 border-2 border-cyan-200 dark:border-cyan-700 hover:border-cyan-400 dark:hover:border-cyan-500 hover:shadow-md hover:shadow-cyan-200/50 dark:hover:shadow-cyan-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-cyan-50 dark:hover:bg-cyan-900/20 text-gray-700 dark:text-gray-300 border-2 border-cyan-200 dark:border-cyan-700 hover:border-cyan-400 dark:hover:border-cyan-500 hover:shadow-md hover:shadow-cyan-200/50 dark:hover:shadow-cyan-900/30'
   },
   {
     selected: 'bg-gradient-to-br from-lime-500 via-lime-600 to-green-600 hover:from-lime-600 hover:via-lime-700 hover:to-green-700 text-white shadow-lg shadow-lime-500/40 border-lime-400',
-    unselected: 'bg-white/80 dark:bg-gray-800/80 hover:bg-lime-50 dark:hover:bg-lime-900/20 text-gray-700 dark:text-gray-300 border-2 border-lime-200 dark:border-lime-700 hover:border-lime-400 dark:hover:border-lime-500 hover:shadow-md hover:shadow-lime-200/50 dark:hover:shadow-lime-900/30'
+    unselected: 'bg-white/80 dark:bg-transparent hover:bg-lime-50 dark:hover:bg-lime-900/20 text-gray-700 dark:text-gray-300 border-2 border-lime-200 dark:border-lime-700 hover:border-lime-400 dark:hover:border-lime-500 hover:shadow-md hover:shadow-lime-200/50 dark:hover:shadow-lime-900/30'
   }
 ];
 
@@ -95,7 +95,7 @@ export function MiRutina() {
   useDocumentTitle('Mi Rutina - FitLife');
   
   // Verificar autenticación
-  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   
   // API Hook
   const { 
@@ -117,7 +117,6 @@ export function MiRutina() {
       const saved = localStorage.getItem('fitlife-dayExercises');
       if (saved) {
         const parsed = JSON.parse(saved);
-        console.log('🔄 Ejercicios cargados desde localStorage:', parsed);
         
         // Filtrar ejercicios inválidos del localStorage
         const cleanedExercises: DayExercises = {};
@@ -134,7 +133,6 @@ export function MiRutina() {
             );
             if (validExercises.length > 0) {
               cleanedExercises[dayKey] = validExercises;
-              console.log(`🧹 Ejercicios válidos para ${dayKey}:`, validExercises.map((e: Exercise) => e.name));
             }
           }
         });
@@ -142,7 +140,7 @@ export function MiRutina() {
         return cleanedExercises;
       }
     } catch (error) {
-      console.warn('⚠️ Error cargando ejercicios desde localStorage:', error);
+      // Error silencioso - no afecta funcionalidad
     }
     return {};
   });
@@ -152,56 +150,24 @@ export function MiRutina() {
   const [createError, setCreateError] = useState<string>('');
   const [creationProgress, setCreationProgress] = useState<string>('');
 
-  // Debug logging
-  console.log('🔍 Mi Rutina Debug:', {
-    isAuthenticated,
-    user,
-    authLoading,
-    userId: user?.id,
-    plansCount: plans.length,
-    plansData: plans,
-    isLoading,
-    error,
-    dayExercisesKeys: Object.keys(dayExercises),
-    dayExercisesData: dayExercises,
-    localStorage: {
-      token: localStorage.getItem('authToken') ? 'Presente' : 'Ausente',
-      user: JSON.parse(localStorage.getItem('userData') || 'null')
-    }
-  });
-
   // Cargar ejercicios desde la API al inicializar
   useEffect(() => {
-    console.log('🔍 useEffect ejecutándose. Plans length:', plans.length);
-    console.log('📋 Plans data:', plans);
-    
     // Validar que plans existe y es un array
     if (!plans || !Array.isArray(plans)) {
-      console.log('⚠️ Plans no es un array válido:', plans);
       return;
     }
     
     if (plans.length > 0) {
-      console.log('🔄 Sincronizando ejercicios desde la API...');
       const newDayExercises: DayExercises = {};
       
-      plans.forEach((plan, planIndex) => {
+      plans.forEach((plan) => {
         // Validar que el plan tenga los datos básicos
         if (!plan) {
-          console.warn('⚠️ Plan vacío o nulo encontrado');
           return;
         }
 
-        console.log(`📋 Plan ${planIndex + 1}:`, {
-          id: plan.id,
-          name: plan.name,
-          trainingDay: plan.trainingDay,
-          exercisesCount: plan.exercises?.length || 0
-        });
-        
         // Validar que trainingDay exista
         if (!plan.trainingDay) {
-          console.warn('⚠️ Plan sin fecha de entrenamiento:', plan);
           return;
         }
 
@@ -209,30 +175,23 @@ export function MiRutina() {
         const planDate = new Date(plan.trainingDay);
         const dayOfWeek = planDate.getDay();
         
-        console.log(`📅 Plan date: ${plan.trainingDay}, Day of week: ${dayOfWeek}`);
-        
         // Convertir el índice del día a la clave del día
         const dayKeys = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
         const dayKey = dayKeys[dayOfWeek];
         
-        console.log(`🗓️ Day key: ${dayKey}`);
-        
         if (plan.exercises && Array.isArray(plan.exercises) && plan.exercises.length > 0) {
-          console.log('💪 Ejercicios encontrados:', plan.exercises.map(e => e.name));
           
           // Convertir ejercicios de la API al formato local, filtrando ejercicios inválidos
           const apiExercises = plan.exercises
             .filter(apiExercise => {
               // Filtrar ejercicios sin datos válidos
               if (!apiExercise || !apiExercise.name || typeof apiExercise.name !== 'string') {
-                console.warn('⚠️ Ejercicio de API sin nombre válido, se omitirá:', apiExercise);
                 return false;
               }
               
               // Filtrar nombres muy cortos, truncados o problemáticos
               const name = apiExercise.name.trim();
               if (name.length < 3 || name.includes('sin nombre') || name.includes('Compl')) {
-                console.warn('⚠️ Ejercicio con nombre problemático, se omitirá:', name);
                 return false;
               }
               
@@ -246,10 +205,8 @@ export function MiRutina() {
               
               // Solo usar ejercicios conocidos de nuestra lista local
               if (localExercise) {
-                console.log(`✅ Ejercicio conocido encontrado: ${apiExercise.name} -> ${localExercise.name}`);
                 return localExercise;
               } else {
-                console.warn(`⚠️ Ejercicio desconocido ignorado: ${apiExercise.name}`);
                 return null;
               }
             })
@@ -265,20 +222,14 @@ export function MiRutina() {
               const exists = newDayExercises[dayKey].some(e => e.id === exercise.id || e.name === exercise.name);
               if (!exists) {
                 newDayExercises[dayKey].push(exercise);
-                console.log(`➕ Agregando ejercicio válido: ${exercise.name} a ${dayKey}`);
-              } else {
-                console.log(`⚠️ Ejercicio duplicado ignorado: ${exercise.name}`);
               }
             });
-          } else {
-            console.log(`⚠️ Plan sin ejercicios válidos después del filtrado: ${plan.name}`);
           }
         } else {
-          console.log(`⚠️ Plan sin ejercicios: ${plan.name}`);
+          // Plan sin ejercicios
         }
       });
       
-      console.log('📅 Ejercicios finales cargados:', newDayExercises);
       
       // Combinar con los ejercicios que ya están en el estado local
       setDayExercises(prevDayExercises => {
@@ -298,10 +249,7 @@ export function MiRutina() {
                 const exists = existingExercises.some(existing => existing.name === newExercise.name);
                 if (!exists) {
                   existingExercises.push(newExercise);
-                  console.log(`🔗 Combinando ejercicio válido: ${newExercise.name} en ${dayKey}`);
                 }
-              } else {
-                console.warn(`⚠️ Ejercicio inválido ignorado durante combinación: ${newExercise?.name || 'sin nombre'}`);
               }
             });
           } else {
@@ -312,15 +260,12 @@ export function MiRutina() {
             );
             if (validExercises.length > 0) {
               combinedExercises[dayKey] = validExercises;
-              console.log(`📝 Asignando ejercicios válidos a ${dayKey}:`, validExercises.map(e => e.name));
             }
           }
         });
         
         return combinedExercises;
       });
-    } else {
-      console.log('📭 No hay planes disponibles');
     }
   }, [plans]);
 
@@ -347,9 +292,8 @@ export function MiRutina() {
       });
       
       localStorage.setItem('fitlife-dayExercises', JSON.stringify(validDayExercises));
-      console.log('💾 Ejercicios válidos guardados en localStorage:', validDayExercises);
     } catch (error) {
-      console.warn('⚠️ Error guardando ejercicios en localStorage:', error);
+      // Error silencioso - no afecta funcionalidad
     }
   }, [dayExercises]);
 
@@ -357,18 +301,17 @@ export function MiRutina() {
   useEffect(() => {
     if (!isAuthenticated) {
       localStorage.removeItem('fitlife-dayExercises');
-      console.log('🧹 Ejercicios limpiados del localStorage (usuario no autenticado)');
     }
   }, [isAuthenticated]);
 
-  const handleDayClick = (day: string) => {
+  const handleDayClick = useCallback((day: string) => {
     setSelectedDay(day);
     setCurrentView('exercises');
     setSelectedExercises([]);
     setSelectedCategory('all');
-  };
+  }, []);
 
-  const handleExerciseToggle = (exercise: Exercise) => {
+  const handleExerciseToggle = useCallback((exercise: Exercise) => {
     setSelectedExercises(prev => {
       const exists = prev.find(e => e.id === exercise.id);
       if (exists) {
@@ -377,7 +320,7 @@ export function MiRutina() {
         return [...prev, exercise];
       }
     });
-  };
+  }, []);
 
   const handleContinueToSchedule = () => {
     if (selectedExercises.length > 0) {
@@ -406,18 +349,9 @@ export function MiRutina() {
         trainingDay: string;
       }> = [];
       
-      // Debug: Log de lo que se va a crear
-      console.log('🔍 Creando rutinas para:', {
-        selectedDaysForExercises,
-        selectedExercises: selectedExercises.map(e => e.name),
-        totalDays: selectedDaysForExercises.length,
-        totalExercises: selectedExercises.length
-      });
-      
       // Crear planes para cada día seleccionado
       for (const day of selectedDaysForExercises) {
         const dayName = daysOfWeek.find(d => d.key === day)?.name || day;
-        console.log(`📅 Procesando día: ${dayName} (${day})`);
         
         // Formatear la fecha para el día (próximo día de la semana)
         const today = new Date();
@@ -432,7 +366,6 @@ export function MiRutina() {
         // Crear identificador único para el plan (con delay para evitar duplicados)
         const planTimestamp = Date.now() + Math.random() * 1000;
         const planId = `plan-${day}-${Math.floor(planTimestamp)}`;
-        console.log(`🆔 ID del plan: ${planId}`);
         
         // Crear el plan de ejercicio
         const planData = {
@@ -456,12 +389,10 @@ export function MiRutina() {
       const newDayExercises = { ...dayExercises };
       selectedDaysForExercises.forEach(day => {
         newDayExercises[day] = [...(newDayExercises[day] || []), ...selectedExercises];
-        console.log(`📋 Agregando ejercicios a ${day}:`, selectedExercises.map(e => e.name));
       });
       setDayExercises(newDayExercises);
       
       // Ahora agregar ejercicios a cada plan creado
-      console.log('🏃 Agregando ejercicios a los planes creados...');
       setCreationProgress('Buscando planes creados...');
       
       // Refrescar planes para obtener los IDs reales
@@ -486,7 +417,6 @@ export function MiRutina() {
         );
         
         if (actualPlan) {
-          console.log(`🎯 Encontrado plan ${createdPlan.dayName} con ID: ${actualPlan.id}`);
           
           // Agregar cada ejercicio al plan
           for (const exercise of createdPlan.exercises) {
@@ -500,20 +430,14 @@ export function MiRutina() {
               });
               
               addedExercises++;
-              console.log(`✅ Ejercicio ${exercise.name} agregado al plan ${createdPlan.dayName}`);
             } catch (exerciseError) {
-              console.error(`❌ Error agregando ejercicio ${exercise.name}:`, exerciseError);
+              // Error silencioso
             }
           }
-        } else {
-          console.warn(`⚠️ No se encontró el plan para ${createdPlan.dayName}`);
         }
       }
       
       setCreationProgress('Finalizando...');
-      
-      // Refrescar planes una vez más para mostrar los ejercicios agregados
-      await refreshPlans();
       
       setCreationProgress('');
       
@@ -528,7 +452,6 @@ export function MiRutina() {
       setTimeout(() => setSuccessMessage(''), 10000); // Ocultar después de 10 segundos
       
     } catch (err) {
-      console.error('Error creating exercise plan:', err);
       setCreateError('Error al crear la rutina. Por favor intenta de nuevo.');
       setTimeout(() => setCreateError(''), 5000);
     } finally {
@@ -536,26 +459,27 @@ export function MiRutina() {
     }
   };
 
-  const handleRemoveExercise = (dayKey: string, exerciseIndex: number) => {
+  const handleRemoveExercise = useCallback((dayKey: string, exerciseIndex: number) => {
     const newDayExercises = { ...dayExercises };
     if (newDayExercises[dayKey]) {
-      const removedExercise = newDayExercises[dayKey][exerciseIndex];
       newDayExercises[dayKey] = newDayExercises[dayKey].filter((_, index) => index !== exerciseIndex);
       if (newDayExercises[dayKey].length === 0) {
         delete newDayExercises[dayKey];
       }
-      console.log(`🗑️ Ejercicio ${removedExercise?.name} eliminado de ${dayKey}`);
     }
     setDayExercises(newDayExercises);
-  };
+  }, [dayExercises]);
 
-  const filteredExercises = selectedCategory === 'all' 
-    ? exercises 
-    : exercises.filter(exercise => exercise.category === selectedCategory);
+  const filteredExercises = useMemo(() => 
+    selectedCategory === 'all' 
+      ? exercises 
+      : exercises.filter(exercise => exercise.category === selectedCategory),
+    [selectedCategory]
+  );
 
-  const getTotalExercisesCount = () => {
+  const getTotalExercisesCount = useCallback(() => {
     return Object.values(dayExercises).reduce((total, exercises) => total + exercises.length, 0);
-  };
+  }, [dayExercises]);
 
   const renderCalendarView = () => (
     <div className="space-y-8">
@@ -650,7 +574,7 @@ export function MiRutina() {
                 <div
                   key={day.key}
                   onClick={() => handleDayClick(day.key)}
-                  className={`group relative bg-white dark:bg-gray-800 rounded-2xl p-4 lg:p-6 min-h-[240px] lg:min-h-[280px] max-h-[320px] w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] border-2 ${
+                  className={`group relative bg-white/70 dark:bg-transparent rounded-2xl p-4 lg:p-6 min-h-[240px] lg:min-h-[280px] max-h-[320px] w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] border-2 ${
                     hasExercises 
                       ? 'border-blue-200 dark:border-blue-700 shadow-lg shadow-blue-100 dark:shadow-blue-900/20' 
                       : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600'
@@ -709,7 +633,6 @@ export function MiRutina() {
                     {(!dayExercises[day.key] || dayExercises[day.key].length === 0) && (
                       <div className="flex items-center justify-center h-full min-h-[120px] text-gray-400 dark:text-gray-500">
                         <div className="text-center">
-                          <div className="text-xl lg:text-2xl mb-2">📋</div>
                           <div className="text-xs">Sin ejercicios</div>
                         </div>
                       </div>
@@ -744,7 +667,7 @@ export function MiRutina() {
         <Button
           variant="ghost"
           onClick={() => setCurrentView('calendar')}
-          className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+          className="p-3 hover:bg-gray-100 dark:hover:bg-transparent rounded-xl transition-colors"
         >
           <ChevronLeft className="w-6 h-6" />
         </Button>
@@ -777,11 +700,16 @@ export function MiRutina() {
           <Button
             key={category.key}
             onClick={() => setSelectedCategory(category.key as any)}
-            variant={selectedCategory === category.key ? "default" : "outline"}
+            variant={selectedCategory === category.key ? "default" : "ghost"}
+            style={selectedCategory !== category.key ? {
+              backgroundColor: '#ffffff !important',
+              color: '#1f2937 !important',
+              borderColor: '#d1d5db !important',
+            } : {}}
             className={`px-6 py-3 rounded-full transition-all duration-300 ${
               selectedCategory === category.key
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl'
-                : 'hover:scale-105'
+                : '!bg-white dark:!bg-white !text-gray-800 dark:!text-gray-800 !border-2 !border-gray-300 dark:!border-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-50 hover:!border-gray-400 dark:hover:!border-gray-500 !shadow-md hover:!shadow-lg hover:scale-105'
             }`}
           >
             {category.icon && <span className="mr-2">{category.icon}</span>}
@@ -799,15 +727,27 @@ export function MiRutina() {
               const colorIndex = parseInt(exercise.id) - 1;
               const colorScheme = exerciseColors[colorIndex];
               
+              // Estilo personalizado blanco para todos los ejercicios no seleccionados
+              let buttonClass;
+              let inlineStyle = {};
+              if (!isSelected) {
+                buttonClass = '!bg-white dark:!bg-white !text-gray-800 dark:!text-gray-800 !border-2 !border-gray-300 dark:!border-gray-400 hover:!bg-gray-50 dark:hover:!bg-gray-50 hover:!border-gray-400 dark:hover:!border-gray-500 !shadow-md hover:!shadow-lg';
+                inlineStyle = {
+                  backgroundColor: '#ffffff !important',
+                  color: '#1f2937 !important',
+                  borderColor: '#d1d5db !important',
+                };
+              } else {
+                buttonClass = colorScheme.selected;
+              }
+              
               return (
                 <Button
                   key={exercise.id}
                   onClick={() => handleExerciseToggle(exercise)}
-                  className={`relative aspect-square min-h-[80px] max-h-[120px] w-full text-xs lg:text-sm font-semibold transition-all duration-300 transform hover:scale-[1.02] lg:hover:scale-105 rounded-xl lg:rounded-2xl backdrop-blur-sm flex flex-col items-center justify-center p-3 lg:p-4 ${
-                    isSelected 
-                      ? colorScheme.selected
-                      : colorScheme.unselected
-                  }`}
+                  variant={!isSelected ? "ghost" : "default"}
+                  style={inlineStyle}
+                  className={`relative aspect-square min-h-[80px] max-h-[120px] w-full text-xs lg:text-sm font-semibold transition-all duration-300 transform hover:scale-[1.02] lg:hover:scale-105 rounded-xl lg:rounded-2xl backdrop-blur-sm flex flex-col items-center justify-center p-3 lg:p-4 ${buttonClass}`}
                 >
                   <div className="flex flex-col items-center gap-1 lg:gap-2 text-center">
                     {exercise.icon && <span className="text-lg lg:text-2xl">{exercise.icon}</span>}
@@ -859,7 +799,7 @@ export function MiRutina() {
         <Button
           variant="ghost"
           onClick={() => setCurrentView('exercises')}
-          className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+          className="p-3 hover:bg-gray-100 dark:hover:bg-transparent rounded-xl transition-colors"
         >
           <ChevronLeft className="w-6 h-6" />
         </Button>
@@ -886,7 +826,7 @@ export function MiRutina() {
               {selectedExercises.map((exercise) => (
                 <div
                   key={exercise.id}
-                  className="flex items-center gap-2 px-2.5 lg:px-3 py-1.5 lg:py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-blue-200 dark:border-blue-700 min-h-[32px] lg:min-h-[36px] min-w-0"
+                  className="flex items-center gap-2 px-2.5 lg:px-3 py-1.5 lg:py-2 bg-white/70 dark:bg-transparent rounded-full shadow-sm border border-blue-200 dark:border-blue-700 min-h-[32px] lg:min-h-[36px] min-w-0"
                 >
                   {exercise.icon && <span className="flex-shrink-0 text-sm">{exercise.icon}</span>}
                   <span className="text-xs lg:text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
@@ -911,7 +851,7 @@ export function MiRutina() {
                   className={`flex items-center justify-between p-4 lg:p-6 rounded-xl lg:rounded-2xl border-2 transition-all duration-300 cursor-pointer min-h-[64px] lg:min-h-[72px] ${
                     isSelected
                       ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-300 dark:border-green-600 shadow-lg shadow-green-100 dark:shadow-green-900/20'
-                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600 hover:shadow-md'
+                      : 'bg-white/70 dark:bg-transparent border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600 hover:shadow-md'
                   }`}
                   onClick={() => handleDayScheduleToggle(day.key)}
                 >

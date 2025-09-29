@@ -5,7 +5,6 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Calculator, Plus, Trash2, Equal, Target, Zap, Apple, Beef, Wheat, Milk } from 'lucide-react';
-import SplashCursor from '../../components/SplashCursor';
 import SpotlightCard from '../../components/SpotlightCard';
 
 interface Food {
@@ -158,18 +157,6 @@ export function Calculadora() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50/30 to-blue-50/30 dark:from-gray-900 dark:via-green-900/10 dark:to-blue-900/10 relative">
-      {/* SplashCursor */}
-      <div className="fixed inset-0 z-10 pointer-events-none">
-        <SplashCursor
-          SPLAT_FORCE={4000}
-          SPLAT_RADIUS={0.12}
-          DENSITY_DISSIPATION={3}
-          VELOCITY_DISSIPATION={1.5}
-          TRANSPARENT={true}
-          SHADING={true}
-          COLOR_UPDATE_SPEED={6}
-        />
-      </div>
       
       {/* Contenido principal */}
       <div className="relative z-30">
@@ -228,8 +215,8 @@ export function Calculadora() {
                         variant={isSelected ? "default" : "outline"}
                         className={`w-full justify-start text-left h-12 transition-all duration-300 ${
                           isSelected
-                            ? `bg-gradient-to-r ${category.color} text-white shadow-lg hover:shadow-xl transform hover:scale-105`
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-800 hover:scale-105 border-gray-200 dark:border-gray-700'
+                            ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
+                            : 'border-gray-200 dark:border-gray-700'
                         }`}
                       >
                         <IconComponent className="w-5 h-5 mr-3" />
@@ -252,8 +239,8 @@ export function Calculadora() {
                       variant="ghost"
                       className={`w-full justify-start text-left p-4 h-auto rounded-xl transition-all duration-300 ${
                         pendingFood?.id === food.id
-                          ? 'bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 shadow-md transform scale-105'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-102 border border-transparent hover:border-gray-200 dark:hover:border-gray-700'
+                          ? 'bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 shadow-md'
+                          : 'border border-transparent'
                       }`}
                     >
                       <div className="w-full">
@@ -325,7 +312,7 @@ export function Calculadora() {
                       key={num}
                       onClick={() => handleNumberClick(num.toString())}
                       variant="outline"
-                      className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 transform hover:scale-105"
+                      className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
                     >
                       {num}
                     </Button>
@@ -333,21 +320,21 @@ export function Calculadora() {
                   <Button
                     onClick={() => handleNumberClick('0')}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 transform hover:scale-105"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
                   >
                     0
                   </Button>
                   <Button
                     onClick={() => handleNumberClick('.')}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 transform hover:scale-105"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
                   >
                     .
                   </Button>
                   <Button
                     onClick={handleDelete}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-red-200 dark:border-red-700 hover:border-red-300 dark:hover:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 transform hover:scale-105"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-red-200 dark:border-red-700 transition-all duration-200"
                   >
                     ←
                   </Button>
@@ -358,14 +345,14 @@ export function Calculadora() {
                   <Button
                     onClick={handleClear}
                     variant="outline"
-                    className="h-12 font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
+                    className="h-12 font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
                   >
                     Limpiar
                   </Button>
                   <Button
                     onClick={handleAddMore}
                     disabled={!pendingFood || !currentWeight}
-                    className="h-12 font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                    className="h-12 font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Agregar
@@ -375,7 +362,7 @@ export function Calculadora() {
                 <Button
                   onClick={handleCalculate}
                   disabled={!pendingFood || !currentWeight}
-                  className="w-full h-12 mt-3 font-semibold rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                  className="w-full h-12 mt-3 font-semibold rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Equal className="w-4 h-4 mr-2" />
                   Calcular
@@ -396,7 +383,7 @@ export function Calculadora() {
                       onClick={clearAll}
                       variant="ghost"
                       size="sm"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200"
+                      className="text-red-600 rounded-xl transition-all duration-200"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -414,7 +401,7 @@ export function Calculadora() {
                       {selectedFoods.map((item, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md"
+                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-200"
                         >
                           <div className="flex-1">
                             <div className="font-medium text-sm text-gray-900 dark:text-white">{item.food.name}</div>
@@ -431,7 +418,7 @@ export function Calculadora() {
                             onClick={() => removeFood(index)}
                             variant="ghost"
                             size="sm"
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all duration-200"
+                            className="text-red-500 p-2 rounded-lg transition-all duration-200"
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
@@ -443,7 +430,7 @@ export function Calculadora() {
 
                 {/* Resultados nutricionales mejorados */}
                 <div className="space-y-4">
-                  <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-700 shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-700 shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-orange-800 dark:text-orange-200 text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
@@ -458,7 +445,7 @@ export function Calculadora() {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700 shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700 shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-blue-800 dark:text-blue-200 text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -473,7 +460,7 @@ export function Calculadora() {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-200 dark:border-yellow-700 shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-200 dark:border-yellow-700 shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-yellow-800 dark:text-yellow-200 text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -488,7 +475,7 @@ export function Calculadora() {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-green-800 dark:text-green-200 text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>

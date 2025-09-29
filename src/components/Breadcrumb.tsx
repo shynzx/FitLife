@@ -21,7 +21,8 @@ export function Breadcrumb() {
     '/mapa': 'Mapa',
     '/mi-rutina': 'Mi Rutina',
     '/comunidad': 'Comunidad',
-    '/desafios': 'Desafíos'
+    '/desafios': 'Desafíos',
+    '/calculadora': 'Calculadora'
   };
 
   // Generar breadcrumbs basado en la ruta actual
@@ -69,7 +70,7 @@ export function Breadcrumb() {
               {item.href ? (
                 <Link 
                   to={item.href}
-                  className="hover:text-blue-600 transition-colors font-medium"
+                  className="text-blue-600 transition-colors font-medium"
                 >
                   {item.label}
                 </Link>
