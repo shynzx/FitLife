@@ -163,7 +163,7 @@ export function Calculadora() {
         <Header />
         <Breadcrumb />
         
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-full">
           {/* Header mejorado */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -212,11 +212,11 @@ export function Calculadora() {
                       <Button
                         key={category.key}
                         onClick={() => setSelectedCategory(category.key)}
-                        variant={isSelected ? "default" : "outline"}
-                        className={`w-full justify-start text-left h-12 transition-all duration-300 ${
+                        variant="outline"
+                        className={`w-full justify-start text-left h-12 transition-all duration-300 bg-white border-2 ${
                           isSelected
-                            ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
-                            : 'border-gray-200 dark:border-gray-700'
+                            ? 'border-blue-300 !bg-blue-50 !text-blue-700 shadow-md'
+                            : 'border-gray-200 dark:border-gray-700 hover:!bg-gray-50'
                         }`}
                       >
                         <IconComponent className="w-5 h-5 mr-3" />
@@ -312,7 +312,7 @@ export function Calculadora() {
                       key={num}
                       onClick={() => handleNumberClick(num.toString())}
                       variant="outline"
-                      className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                      className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                     >
                       {num}
                     </Button>
@@ -320,21 +320,21 @@ export function Calculadora() {
                   <Button
                     onClick={() => handleNumberClick('0')}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                   >
                     0
                   </Button>
                   <Button
                     onClick={() => handleNumberClick('.')}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                   >
                     .
                   </Button>
                   <Button
                     onClick={handleDelete}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-red-200 dark:border-red-700 transition-all duration-200"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-orange-200 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-200"
                   >
                     ←
                   </Button>
@@ -345,14 +345,15 @@ export function Calculadora() {
                   <Button
                     onClick={handleClear}
                     variant="outline"
-                    className="h-12 font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                    className="h-12 font-semibold rounded-xl border-2 border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
                   >
                     Limpiar
                   </Button>
                   <Button
                     onClick={handleAddMore}
                     disabled={!pendingFood || !currentWeight}
-                    className="h-12 font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="outline"
+                    className="h-12 font-semibold rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50 shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Agregar
@@ -362,7 +363,8 @@ export function Calculadora() {
                 <Button
                   onClick={handleCalculate}
                   disabled={!pendingFood || !currentWeight}
-                  className="w-full h-12 mt-3 font-semibold rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  variant="outline"
+                  className="w-full h-12 mt-3 font-semibold rounded-xl border-2 border-green-200 text-green-600 hover:bg-green-50 shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Equal className="w-4 h-4 mr-2" />
                   Calcular
@@ -383,7 +385,7 @@ export function Calculadora() {
                       onClick={clearAll}
                       variant="ghost"
                       size="sm"
-                      className="text-red-600 rounded-xl transition-all duration-200"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

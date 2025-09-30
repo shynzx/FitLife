@@ -18,7 +18,7 @@ export function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="max-w-full min-h-screen bg-transparent relative">
       {/* SplashCursor - Efecto de fluido interactivo detrás de todo */}
       <div className="fixed inset-0 z-10">
         <SplashCursor
@@ -33,11 +33,11 @@ export function Home() {
       </div>
       
       {/* Contenido principal con z-index superior */}
-      <div className="relative z-30">
+      <div className="relative z-30 ">
         <Header />
         <Breadcrumb />
         
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="max-w-full mx-auto px-15 py-18">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             <TextType

@@ -6,6 +6,7 @@ import { Meditacion } from '../pages/meditacion';
 import { Mapa } from '../pages/mapa';
 import { MiRutina } from '../pages/miRutina';
 import { Calculadora } from '../pages/calculadora';
+import { PlanNutricional } from '../pages/planNutricional';
 
 import { NotFound } from '../pages/notFound';
 
@@ -42,9 +43,13 @@ export const router = createBrowserRouter([
         path: "mi-rutina",
         element: <MiRutina />,
       },
-        {
+      {
         path: "calculadora",
         element: <Calculadora />,
+      },
+      {
+        path: "plan-nutricional",
+        element: <PlanNutricional />,
       },
    
       {

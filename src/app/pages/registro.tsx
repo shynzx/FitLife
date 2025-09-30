@@ -170,6 +170,7 @@ export function Registro() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Tu nombre completo"
+                maxLength={20}
                 required
                 className="w-full h-12 border-gray-300 rounded-lg text-black placeholder:text-gray-400 hover:scale-105 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:scale-105 transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] autofill:bg-transparent autofill:shadow-[inset_0_0_0px_1000px_transparent]"
                 style={{

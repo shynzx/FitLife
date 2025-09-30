@@ -1153,7 +1153,7 @@ export function MiRutina() {
         <Header />
         <Breadcrumb />
         
-        <main className="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-6 lg:py-8 max-w-7xl">
+        <main className="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-6 lg:py-8 max-w-full">
           {currentView === 'calendar' && renderCalendarView()}
           {currentView === 'exercises' && renderExercisesView()}
           {currentView === 'schedule' && renderScheduleView()}

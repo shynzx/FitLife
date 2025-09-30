@@ -1,4 +1,4 @@
-import { Calendar, User, Calculator, Map, UserCircle, LogOut } from 'lucide-react'
+import { Calendar, User, Calculator, Map, UserCircle, LogOut, Utensils } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   HoverCard,
@@ -133,6 +133,33 @@ export function Header() {
                   <Map className="mr-2 h-4 w-4 opacity-70" />
                   <span className="text-xs text-gray-500">
                     Ubicaciones fitness cercanas a ti
+                  </span>
+                </div>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Link to="/plan-nutricional" className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
+                <div className="flex items-center space-x-2">
+                  <Utensils size={20} className="text-black" />
+                  <span className="text-black font-medium">Plan Nutricional</span>
+                </div>
+                <div className="h-0.5 w-0 bg-black transition-all duration-200 group-hover:w-full"></div>
+              </Link>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold">Plan Nutricional</h4>
+                <p className="text-sm text-gray-600">
+                  Crea planes nutricionales personalizados, calcula macronutrientes 
+                  y mantén un registro de tu alimentación diaria para alcanzar tus objetivos.
+                </p>
+                <div className="flex items-center pt-2">
+                  <Utensils className="mr-2 h-4 w-4 opacity-70" />
+                  <span className="text-xs text-gray-500">
+                    Nutrición personalizada para tu estilo de vida
                   </span>
                 </div>
               </div>
