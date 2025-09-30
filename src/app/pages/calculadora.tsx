@@ -156,7 +156,7 @@ export function Calculadora() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50/30 to-blue-50/30 dark:from-gray-900 dark:via-green-900/10 dark:to-blue-900/10 relative">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50/30 to-blue-50/30">
       
       {/* Contenido principal */}
       <div className="relative z-30">
@@ -174,21 +174,21 @@ export function Calculadora() {
                 Calculadora Nutricional
               </h1>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
+            <p className="text-gray-600  max-w-2xl mx-auto mb-6">
               Selecciona alimentos, ingresa el peso y obtén información nutricional detallada
             </p>
             
             {/* Estadísticas */}
             <div className="flex justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <Target className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-green-700 dark:text-green-300 font-medium">
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full">
+                <Target className="w-4 h-4 text-green-600 " />
+                <span className="text-green-700 ">
                   {getTotalFoodsCount()} alimentos seleccionados
                 </span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-blue-700 dark:text-blue-300 font-medium">
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-100  rounded-full">
+                <Zap className="w-4 h-4 text-blue-600 " />
+                <span className="text-blue-700  font-medium">
                   {Math.round(totals.calories)} calorías totales
                 </span>
               </div>
@@ -199,7 +199,7 @@ export function Calculadora() {
             {/* Panel izquierdo - Categorías y Alimentos */}
             <div className="lg:col-span-3">
               <SpotlightCard className="p-6" spotlightColor="rgba(34, 197, 94, 0.15)">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-xl font-bold text-gray-900  mb-4">
                   Categorías de Alimentos
                 </h2>
                 
@@ -216,7 +216,7 @@ export function Calculadora() {
                         className={`w-full justify-start text-left h-12 transition-all duration-300 ${
                           isSelected
                             ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
-                            : 'border-gray-200 dark:border-gray-700'
+                            : 'border-gray-200'
                         }`}
                       >
                         <IconComponent className="w-5 h-5 mr-3" />
@@ -228,7 +228,7 @@ export function Calculadora() {
 
                 {/* Lista de alimentos mejorada */}
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                  <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                  <h3 className="font-semibold text-gray-700  mb-3 flex items-center gap-2">
                     <span className="w-2 h-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></span>
                     {selectedCategory}
                   </h3>
@@ -239,17 +239,17 @@ export function Calculadora() {
                       variant="ghost"
                       className={`w-full justify-start text-left p-4 h-auto rounded-xl transition-all duration-300 ${
                         pendingFood?.id === food.id
-                          ? 'bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 shadow-md'
+                          ? 'bg-blue-100  border-2 border-blue-300  shadow-md'
                           : 'border border-transparent'
                       }`}
                     >
                       <div className="w-full">
-                        <div className="font-medium text-gray-900 dark:text-white">{food.name}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                          <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-0.5 rounded-full">
+                        <div className="font-medium text-gray-900 ">{food.name}</div>
+                        <div className="text-xs text-gray-500  mt-1 flex items-center gap-2">
+                          <span className="bg-orange-100  text-orange-700  px-2 py-0.5 rounded-full">
                             {food.calories} cal/100g
                           </span>
-                          <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                          <span className="bg-blue-100  text-blue-700  px-2 py-0.5 rounded-full">
                             {food.protein}g proteína
                           </span>
                         </div>
@@ -263,14 +263,14 @@ export function Calculadora() {
             {/* Panel central - Calculadora */}
             <div className="lg:col-span-5">
               <SpotlightCard className="p-6" spotlightColor="rgba(59, 130, 246, 0.15)">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-gray-900  mb-4 flex items-center gap-2">
                   <Calculator className="w-5 h-5" />
                   Calculadora de Peso
                 </h2>
 
                 {/* Alimento seleccionado mejorado */}
                 {pendingFood && (
-                  <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-700">
+                  <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 ">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                         <span className="text-white font-bold text-sm">
@@ -278,10 +278,10 @@ export function Calculadora() {
                         </span>
                       </div>
                       <div>
-                        <div className="font-medium text-blue-800 dark:text-blue-200">
+                        <div className="font-medium text-blue-800 ">
                           {pendingFood.name}
                         </div>
-                        <div className="text-sm text-blue-600 dark:text-blue-300 flex items-center gap-2">
+                        <div className="text-sm text-blue-600  flex items-center gap-2">
                           <span>{pendingFood.calories} cal</span>
                           <span>•</span>
                           <span>{pendingFood.protein}g proteína por 100g</span>
@@ -293,12 +293,12 @@ export function Calculadora() {
 
                 {/* Display mejorado */}
                 <div className="mb-6">
-                  <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-200 dark:border-green-700 rounded-2xl p-6 min-h-[100px] flex items-center justify-center shadow-inner">
+                  <div className="bg-gradient-to-r from-green-100 to-emerald-100  border-2 border-green-200  rounded-2xl p-6 min-h-[100px] flex items-center justify-center shadow-inner">
                     <div className="text-center">
-                      <span className="text-4xl font-bold text-green-800 dark:text-green-200">
+                      <span className="text-4xl font-bold text-green-800 ">
                         {currentWeight || '0'}
                       </span>
-                      <span className="text-2xl font-semibold text-green-600 dark:text-green-400 ml-2">
+                      <span className="text-2xl font-semibold text-green-600  ml-2">
                         gramos
                       </span>
                     </div>
@@ -312,7 +312,7 @@ export function Calculadora() {
                       key={num}
                       onClick={() => handleNumberClick(num.toString())}
                       variant="outline"
-                      className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                      className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200  transition-all duration-200"
                     >
                       {num}
                     </Button>
@@ -320,21 +320,21 @@ export function Calculadora() {
                   <Button
                     onClick={() => handleNumberClick('0')}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200  transition-all duration-200"
                   >
                     0
                   </Button>
                   <Button
                     onClick={() => handleNumberClick('.')}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-gray-200  transition-all duration-200"
                   >
                     .
                   </Button>
                   <Button
                     onClick={handleDelete}
                     variant="outline"
-                    className="h-14 text-lg font-semibold rounded-xl border-2 border-red-200 dark:border-red-700 transition-all duration-200"
+                    className="h-14 text-lg font-semibold rounded-xl border-2 border-red-200  transition-all duration-200"
                   >
                     ←
                   </Button>
@@ -345,7 +345,7 @@ export function Calculadora() {
                   <Button
                     onClick={handleClear}
                     variant="outline"
-                    className="h-12 font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 transition-all duration-200"
+                    className="h-12 font-semibold rounded-xl border-2 border-gray-200  transition-all duration-200"
                   >
                     Limpiar
                   </Button>
@@ -374,7 +374,7 @@ export function Calculadora() {
             <div className="lg:col-span-4">
               <SpotlightCard className="p-6" spotlightColor="rgba(139, 92, 246, 0.15)">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                     <Target className="w-5 h-5" />
                     Información Nutricional
                   </h2>
@@ -393,7 +393,7 @@ export function Calculadora() {
                 {/* Alimentos seleccionados mejorados */}
                 {selectedFoods.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <h3 className="font-semibold text-gray-700  mb-3 flex items-center gap-2">
                       <span className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></span>
                       Alimentos seleccionados:
                     </h3>
@@ -401,15 +401,15 @@ export function Calculadora() {
                       {selectedFoods.map((item, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-200"
+                          className="flex items-center justify-between p-3 bg-gray-50  rounded-xl border border-gray-200  transition-all duration-200"
                         >
                           <div className="flex-1">
-                            <div className="font-medium text-sm text-gray-900 dark:text-white">{item.food.name}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1">
-                              <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                            <div className="font-medium text-sm text-gray-900 ">{item.food.name}</div>
+                            <div className="text-xs text-gray-500  flex items-center gap-2 mt-1">
+                              <span className="bg-blue-100  text-blue-700  px-2 py-0.5 rounded-full">
                                 {item.weight}g
                               </span>
-                              <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-0.5 rounded-full">
+                              <span className="bg-orange-100  text-orange-700  px-2 py-0.5 rounded-full">
                                 {Math.round((item.food.calories * item.weight) / 100)} cal
                               </span>
                             </div>
@@ -430,70 +430,70 @@ export function Calculadora() {
 
                 {/* Resultados nutricionales mejorados */}
                 <div className="space-y-4">
-                  <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-700 shadow-sm transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-orange-50 to-red-50  border-orange-200  shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-orange-800 dark:text-orange-200 text-lg flex items-center gap-2">
+                      <CardTitle className="text-orange-800  text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                         Calorías
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">
+                      <div className="text-3xl font-bold text-orange-900 ">
                         {Math.round(totals.calories)}
                       </div>
-                      <div className="text-sm text-orange-600 dark:text-orange-300">kcal</div>
+                      <div className="text-sm text-orange-600 ">kcal</div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700 shadow-sm transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-blue-50 to-indigo-50  border-blue-200  shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-blue-800 dark:text-blue-200 text-lg flex items-center gap-2">
+                      <CardTitle className="text-blue-800  text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                         Proteínas
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
+                      <div className="text-3xl font-bold text-blue-900 ">
                         {Math.round(totals.protein * 10) / 10}
                       </div>
-                      <div className="text-sm text-blue-600 dark:text-blue-300">gramos</div>
+                      <div className="text-sm text-blue-600 ">gramos</div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-200 dark:border-yellow-700 shadow-sm transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-yellow-50 to-amber-50  border-yellow-200  shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-yellow-800 dark:text-yellow-200 text-lg flex items-center gap-2">
+                      <CardTitle className="text-yellow-800  text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                         Grasas
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-3xl font-bold text-yellow-900 dark:text-yellow-100">
+                      <div className="text-3xl font-bold text-yellow-900 ">
                         {Math.round(totals.fat * 10) / 10}
                       </div>
-                      <div className="text-sm text-yellow-600 dark:text-yellow-300">gramos</div>
+                      <div className="text-sm text-yellow-600 ">gramos</div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-sm transition-shadow duration-200">
+                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50  border-green-200  shadow-sm transition-shadow duration-200">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-green-800 dark:text-green-200 text-lg flex items-center gap-2">
+                      <CardTitle className="text-green-800  text-lg flex items-center gap-2">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         Carbohidratos
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-3xl font-bold text-green-900 dark:text-green-100">
+                      <div className="text-3xl font-bold text-green-900 ">
                         {Math.round(totals.carbs * 10) / 10}
                       </div>
-                      <div className="text-sm text-green-600 dark:text-green-300">gramos</div>
+                      <div className="text-sm text-green-600 ">gramos</div>
                     </CardContent>
                   </Card>
                 </div>
 
                 {selectedFoods.length === 0 && (
-                  <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="text-center py-12 text-gray-500 ">
+                    <div className="w-16 h-16 bg-gray-100  rounded-full flex items-center justify-center mx-auto mb-4">
                       <Calculator className="w-8 h-8 opacity-50" />
                     </div>
                     <p className="text-lg font-medium mb-2">¡Comienza a calcular!</p>

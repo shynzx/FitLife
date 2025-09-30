@@ -22,7 +22,8 @@ export function Breadcrumb() {
     '/mi-rutina': 'Mi Rutina',
     '/comunidad': 'Comunidad',
     '/desafios': 'Desafíos',
-    '/calculadora': 'Calculadora'
+    '/calculadora': 'Calculadora',
+    '/plan-nutricional': 'Plan Nutricional'
   };
 
   // Generar breadcrumbs basado en la ruta actual

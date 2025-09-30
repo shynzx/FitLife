@@ -1,4 +1,4 @@
-import { Calendar, User, Calculator, Map, UserCircle, LogOut } from 'lucide-react'
+import { Calendar, User, Calculator, Map, CircleUser as UserCircle, LogOut } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   HoverCard,
@@ -30,7 +30,7 @@ export function Header() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex items-center space-x-8">
+        <nav className="flex items-center space-x-6">
           <HoverCard>
             <HoverCardTrigger asChild>
               <Link to="/mi-rutina" className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
@@ -85,6 +85,36 @@ export function Header() {
             </HoverCardContent>
           </HoverCard>
 
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Link to="/plan-nutricional" className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
+                <div className="flex items-center space-x-2">
+                  <svg size={20} className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                  </svg>
+                  <span className="text-black font-medium">Plan Nutricional</span>
+                </div>
+                <div className="h-0.5 w-0 bg-black transition-all duration-200 group-hover:w-full"></div>
+              </Link>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold">Plan Nutricional</h4>
+                <p className="text-sm text-gray-600">
+                  Calcula tus necesidades diarias de calorías, proteínas, carbohidratos y grasas 
+                  basándose en tu edad, peso, altura, actividad física y objetivos.
+                </p>
+                <div className="flex items-center pt-2">
+                  <svg className="mr-2 h-4 w-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                  </svg>
+                  <span className="text-xs text-gray-500">
+                    Plan personalizado según tus objetivos
+                  </span>
+                </div>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
           <HoverCard>
             <HoverCardTrigger asChild>
               <Link to="/calculadora" className="flex flex-col items-center space-y-1 px-4 py-2 cursor-pointer transition-all duration-200 hover:scale-110 group">
